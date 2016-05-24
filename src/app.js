@@ -10,7 +10,7 @@ export default function App ({DOM, Keys}) {
   );
 
   const state$ = action$
-    .startWith(initialState)
+    .startWith(null)
     .scan((state, action) => action(state));
 
   return {
