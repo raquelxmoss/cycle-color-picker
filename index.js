@@ -1,7 +1,6 @@
 import {run} from '@cycle/core';
 import {makeDOMDriver} from '@cycle/dom';
 import {restart, restartable} from 'cycle-restart';
-import {makeKeysDriver} from 'cycle-keys';
 import isolate from '@cycle/isolate';
 
 var app = require('./src/app').default;
