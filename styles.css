@@ -5,6 +5,14 @@ html, body {
   width: 100%;
   background: rgba(204, 204, 204, 0.1);
   font-family: Open sans, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  position: relative;
 }
 
 .swatch {
@@ -17,6 +25,7 @@ html, body {
   position: relative;
   height: 200px;
   width: 200px;
+  cursor: pointer;
 }
 
 .color-overlay {

@@ -83,8 +83,8 @@ function updateIndicatorPosition (event) {
     } = containerBoundaries(state, event);
 
     const indicatorPosition = {
-      left: between(0, containerWidth, left),
-      top: between(0, containerHeight, top)
+      left: between(0, containerWidth + containerLeft, left) - containerLeft,
+      top: between(0, containerHeight + containerTop, top) - containerTop
     };
 
     return Object.assign(state, {}, {isDragging: true, indicatorPosition});
@@ -92,10 +92,14 @@ function updateIndicatorPosition (event) {
 }
 
 function view (state) {
+  const indicatorColor = tinycolor.mix('#fff', '#000', parseFloat(state.color.l)).toHexString();
+
   const indicatorStyle = {
     left: `${state.indicatorPosition.left}px`,
-    top: `${state.indicatorPosition.top}px`
+    top: `${state.indicatorPosition.top}px`,
+    'border-color': indicatorColor
   };
+
   const swatchStyle = {background: tinycolor(state.color).toHexString()};
 
   return div('.container', [
@@ -123,7 +127,7 @@ export default function App ({DOM, Keys}) {
     .map(ev => state => Object.assign({}, state, {isDragging: false}));
 
   const mouseMove$ = colorPicker
-    .events('mousemove')
+    .events('mousemove');
 
   const updateColor$ = mouseMove$
     .map(ev => updateColor(event));
