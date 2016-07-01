@@ -4,10 +4,10 @@ import tinycolor from 'tinycolor2';
 
 function containerBoundaries (state, event) {
   // ReactColor uses clientWidth and clientHeight here. There's probably a reason for that, so if there's a bug, try changing this.
-  const containerWidth = state.container.width;
-  const containerHeight = state.container.height;
-  const containerLeft = state.container.left;
-  const containerTop = state.container.top;
+  const containerWidth = state.saturationContainer.width;
+  const containerHeight = state.saturationContainer.height;
+  const containerLeft = state.saturationContainer.left;
+  const containerTop = state.saturationContainer.top;
 
   const left = event.pageX - containerLeft;
   const top = event.pageY - containerTop;
@@ -25,9 +25,9 @@ function containerBoundaries (state, event) {
   };
 }
 
-function updateColor (event) {
+function updateSaturation (event) {
   return state => {
-    if (!state.isDragging) { return state; }
+    if (!state.saturationIsDragging) { return state; }
 
     const {
       isInBounds,
@@ -67,9 +67,9 @@ function between (min, max, value) {
   return value;
 }
 
-function updateIndicatorPosition (event) {
+function updateSaturationIndicatorPosition (event) {
   return state => {
-    if (!state.isDragging) { return state; }
+    if (!state.saturationIsDragging) { return state; }
 
     const left = event.clientX;
     const top = event.clientY;
@@ -82,69 +82,71 @@ function updateIndicatorPosition (event) {
       containerLeft
     } = containerBoundaries(state, event);
 
-    const indicatorPosition = {
+    const saturationIndicatorPosition = {
       left: between(0, containerWidth + containerLeft, left) - containerLeft,
       top: between(0, containerHeight + containerTop, top) - containerTop
     };
 
-    return Object.assign(state, {}, {isDragging: true, indicatorPosition});
+    return Object.assign(state, {}, {saturationIsDragging: true, saturationIndicatorPosition});
   };
 }
 
 function view (state) {
-  const indicatorColor = tinycolor.mix('#fff', '#000', parseFloat(state.color.l)).toHexString();
+  const saturationIndicatorColor = tinycolor.mix('#fff', '#000', parseFloat(state.color.l)).toHexString();
 
-  const indicatorStyle = {
-    left: `${state.indicatorPosition.left}px`,
-    top: `${state.indicatorPosition.top}px`,
-    'border-color': indicatorColor
+  const saturationIndicatorStyle = {
+    left: `${state.saturationIndicatorPosition.left}px`,
+    top: `${state.saturationIndicatorPosition.top}px`,
+    'border-color': saturationIndicatorColor
   };
 
   const swatchStyle = {background: tinycolor(state.color).toHexString()};
 
   return div('.container', [
     div('.color-picker', [
-      div('.color-overlay'),
-      div('.color'),
-      div('.black'),
-      div('.indicator', {style: indicatorStyle})
+      div('.saturation', [
+        div('.color-overlay'),
+        div('.color'),
+        div('.black'),
+        div('.indicator', {style: saturationIndicatorStyle})
+      ])
     ]),
     div('.swatch', {style: swatchStyle})
   ]);
 }
 
 export default function App ({DOM, Keys}) {
-  const colorPicker = DOM
-    .select('.color-picker');
-
-  const mouseDown$ = colorPicker
-    .events('mousedown')
-    .map(ev => state => Object.assign({}, state, {isDragging: true}));
-
   const mouseUp$ = DOM
     .select(':root')
     .events('mouseup')
-    .map(ev => state => Object.assign({}, state, {isDragging: false}));
+    .map(ev => state => Object.assign({}, state, {saturationIsDragging: false}));
 
-  const mouseMove$ = colorPicker
+  const saturation = DOM
+    .select('.saturation');
+
+  const saturationMouseDown$ = saturation
+    .events('mousedown')
+    .map(ev => state => Object.assign({}, state, {saturationIsDragging: true}));
+
+  const saturationMouseMove$ = saturation
     .events('mousemove');
 
-  const updateColor$ = mouseMove$
-    .map(ev => updateColor(event));
+  const updateSaturation$ = saturationMouseMove$
+    .map(ev => updateSaturation(event));
 
-  const updateIndicatorPosition$ = mouseMove$
-    .map(ev => updateIndicatorPosition(ev));
+  const updateSaturationIndicatorPosition$ = saturationMouseMove$
+    .map(ev => updateSaturationIndicatorPosition(ev));
 
-  const containerDimensions$ = colorPicker
+  const saturationContainerDimensions$ = saturation
     .observable
     .map(el => el[0].getBoundingClientRect())
-    .map(value => state => Object.assign({}, state, {container: value}))
+    .map(value => state => Object.assign({}, state, {saturationContainer: value}))
     .take(1);
 
   const initialState = {
-    container: null,
-    isDragging: false,
-    indicatorPosition: {
+    saturationContainer: null,
+    saturationIsDragging: false,
+    saturationIndicatorPosition: {
       left: 0,
       top: 0
     },
@@ -152,11 +154,11 @@ export default function App ({DOM, Keys}) {
  };
 
   const action$ = Observable.merge(
-    mouseDown$,
     mouseUp$,
-    updateColor$,
-    updateIndicatorPosition$,
-    containerDimensions$
+    saturationMouseDown$,
+    updateSaturation$,
+    updateSaturationIndicatorPosition$,
+    saturationContainerDimensions$
   );
 
   const state$ = action$
