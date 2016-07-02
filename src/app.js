@@ -2,7 +2,20 @@ import {input, div, button, p} from '@cycle/dom';
 import {Observable} from 'rx';
 import tinycolor from 'tinycolor2';
 
-import {containerBoundaries} from './helpers';
+import {between, containerBoundaries} from './helpers';
+
+// TODO:
+// - Eat food (don't work on this while you're hungry)
+// - Split Alpha into sub-component
+// - Split Hue into sub-component
+// - Split Saturation into sub-component
+// - Fix indicators overshooting by 10px
+// - Pretty up the CSS
+// - Set starting state
+// - Add Hex/RGBA display
+// - Allow pasting in of Hex/RGBA
+// - Allow clicking on components (rather than just drag)
+// - Dry up code where possible (but save this to last)
 
 function updateSaturation (event) {
   return state => {
@@ -32,18 +45,6 @@ function updateSaturation (event) {
 
     return state;
   };
-}
-
-function between (min, max, value) {
-  if (value < min) {
-    return min;
-  }
-
-  if (value > max) {
-    return max;
-  }
-
-  return value;
 }
 
 function updateSaturationIndicatorPosition (event) {
@@ -169,7 +170,6 @@ function view (state) {
   const swatchBackground = tinycolor(state.color).setAlpha(state.color.a);
   const swatchStyle = {background: tinycolor(swatchBackground).toRgbString()};
 
-  console.log(state.color.a);
   const gradientStart = tinycolor(state.color).setAlpha(0);
   const gradientStyle = {background: `linear-gradient(to right, ${tinycolor(gradientStart).toRgbString()}  0%, ${tinycolor(tinycolor(state.color).toHexString()).toRgbString()} 100%)`};
 
