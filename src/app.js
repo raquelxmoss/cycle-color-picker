@@ -2,30 +2,7 @@ import {input, div, button, p} from '@cycle/dom';
 import {Observable} from 'rx';
 import tinycolor from 'tinycolor2';
 
-function containerBoundaries (state, event, type) {
-  // ReactColor uses clientWidth and clientHeight here. There's probably a reason for that, so if there's a bug, try changing this.
-  const container = state[`${type}Container`];
-
-  const containerWidth = container.width;
-  const containerHeight = container.height;
-  const containerLeft = container.left;
-  const containerTop = container.top;
-
-  const left = event.pageX - containerLeft;
-  const top = event.pageY - containerTop;
-
-  const isInBounds = left > 0 && top > 0 && left < containerWidth && top < containerHeight;
-
-  return {
-    isInBounds,
-    containerWidth,
-    containerHeight,
-    containerLeft,
-    containerTop,
-    top,
-    left
-  };
-}
+import {containerBoundaries} from './helpers';
 
 function updateSaturation (event) {
   return state => {
@@ -129,7 +106,46 @@ function updateHue (event) {
     }
 
     return state;
-  }
+  };
+}
+
+function updateAlphaIndicatorPosition (event) {
+  return state => {
+    if (!state.alphaIsDragging) { return state; }
+
+    const left = event.clientX;
+
+    const {
+      containerWidth,
+      containerLeft
+    } = containerBoundaries(state, event, 'alpha');
+
+    const alphaIndicatorPosition = {
+      left: between(0, containerWidth + containerLeft, left) - containerLeft
+    };
+
+    return Object.assign(state, {}, {alphaIsDragging: true, alphaIndicatorPosition});
+  };
+}
+
+function updateAlpha (event) {
+  return state => {
+    if (!state.alphaIsDragging) { return state; }
+
+    const {
+      containerWidth,
+      left
+    } = containerBoundaries(state, event, 'alpha');
+
+    const a = (between(0, containerWidth, left) * 100 / containerWidth) / 100;
+    const color = Object.assign(
+      {},
+      state.color,
+      {a}
+    );
+
+    return Object.assign({}, state, {color});
+  };
 }
 
 function view (state) {
@@ -146,7 +162,16 @@ function view (state) {
     left: `${state.hueIndicatorPosition.left}px`
   };
 
-  const swatchStyle = {background: tinycolor(state.color).toHexString()};
+  const alphaIndicatorStyle = {
+    left: `${state.alphaIndicatorPosition.left}px`
+  };
+
+  const swatchBackground = tinycolor(state.color).setAlpha(state.color.a);
+  const swatchStyle = {background: tinycolor(swatchBackground).toRgbString()};
+
+  console.log(state.color.a);
+  const gradientStart = tinycolor(state.color).setAlpha(0);
+  const gradientStyle = {background: `linear-gradient(to right, ${tinycolor(gradientStart).toRgbString()}  0%, ${tinycolor(tinycolor(state.color).toHexString()).toRgbString()} 100%)`};
 
   return div('.container', [
     div('.color-picker', [
@@ -160,6 +185,13 @@ function view (state) {
         div('.hue', [
           div('.hue-indicator', {style: hueIndicatorStyle})
         ])
+      ]),
+      div('.alpha-container', [
+        div('.alpha', [
+          div('.checkerboard'),
+          div('.gradient-overlay', {style: gradientStyle}),
+          div('.alpha-indicator', {style: alphaIndicatorStyle})
+        ])
       ])
     ]),
     div('.swatch', {style: swatchStyle})
@@ -170,7 +202,8 @@ export default function App ({DOM, Mouse}) {
   const mouseUp$ = Mouse.up()
     .map(ev => state => Object.assign({}, state, {
       saturationIsDragging: false,
-      hueIsDragging: false
+      hueIsDragging: false,
+      alphaIsDragging: false
     }));
 
   const saturation = DOM
@@ -217,6 +250,28 @@ export default function App ({DOM, Mouse}) {
     .map(value => state => Object.assign({}, state, {hueContainer: value}))
     .take(1);
 
+  const alpha = DOM
+    .select('.alpha');
+
+  const alphaMouseDown$ = alpha
+    .events('mousedown')
+    .map(ev => state => Object.assign({}, state, {alphaIsDragging: true}));
+
+  const alphaMouseMove$ = alpha
+    .events('mousemove');
+
+  const updateAlpha$ = alphaMouseMove$
+    .map(ev => updateAlpha(ev));
+
+  const updateAlphaIndicatorPosition$ = alphaMouseMove$
+    .map(ev => updateAlphaIndicatorPosition(ev));
+
+  const alphaContainer$ = alpha
+    .observable
+    .map(el => el[0].getBoundingClientRect())
+    .map(value => state => Object.assign({}, state, {alphaContainer: value}))
+    .take(1);
+
   const initialState = {
     saturationContainer: null,
     saturationIsDragging: false,
@@ -230,6 +285,13 @@ export default function App ({DOM, Mouse}) {
       left: 0,
       top: 0
     },
+    alphaContainer: null,
+    alphaIsDragging: false,
+    alphaIndicatorPosition: {
+      top: 0,
+      left: 0
+    }
+    ,
     color: tinycolor('white').toHsl()
  };
 
@@ -242,7 +304,11 @@ export default function App ({DOM, Mouse}) {
     hueMouseDown$,
     updateHue$,
     updateHueIndicatorPosition$,
-    hueContainer$
+    hueContainer$,
+    alphaMouseDown$,
+    updateAlpha$,
+    alphaContainer$,
+    updateAlphaIndicatorPosition$
   );
 
   const state$ = action$

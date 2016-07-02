@@ -67,9 +67,11 @@ html, body {
   z-index: 5;
 }
 
-.hue-container {
+.hue-container,
+.alpha-container {
   position: relative;
   margin-top: 10px;
+  height: 10px;
 }
 
 .hue {
@@ -77,12 +79,46 @@ html, body {
   height: 10px;
   width: 100%;
   position: absolute;
+  cursor: pointer;
 }
 
-.hue-indicator {
+.hue-indicator,
+.alpha-indicator {
   position: absolute;
   width: 10px;
   height: 10px;
   background: white;
   border-radius: 50%;
+}
+
+.alpha {
+  background: black;
+  height: 10px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.gradient-overlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+.checkerboard {
+  position: absolute;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  width: 200px;
+  height: 10px;
+  background: -webkit-linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), -webkit-linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), rgb(255, 255, 255);
+  background: -moz-linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), -moz-linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), rgb(255, 255, 255);
+  background: linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), rgb(255, 255, 255);
+  background-position: 0 0, 5px 5px;
+  -webkit-background-origin: padding-box;
+  background-origin: padding-box;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-background-size: 10px 10px;
+  background-size: 10px 10px;
 }
