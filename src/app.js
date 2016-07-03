@@ -10,11 +10,9 @@ import makeReducer$ from './reducers';
 // - Eat food (don't work on this while you're hungry)
 // - Fix indicators overshooting by 10px
 // - Pretty up the CSS
-// - Set starting state
 // - Add Hex/RGBA display
 // - Allow pasting in of Hex/RGBA
 // - Allow clicking on components (rather than just drag)
-// - Make the component emit a color$
 // - Test
 // - Publish to NPM
 
