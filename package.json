@@ -19,6 +19,11 @@
     "rx"
   ],
   "author": "Raquel Moss",
+  "contributors": [
+    {
+      "name": "Nick Johnstone"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/raquelxmoss/cycle-color-picker/issues"

@@ -5,14 +5,30 @@ html, body {
   width: 100%;
   background: rgba(204, 204, 204, 0.1);
   font-family: Open sans, sans-serif;
+}
+
+.app {
+  height: 100%;
+}
+
+.app-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
+
 
 .container {
   position: relative;
+}
+
+.color-picker {
+  background: #eee;
+  padding: 20px;
+  border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.298039) 0px 0px 2px, rgba(0, 0, 0, 0.298039) 0px 4px 8px;
 }
 
 .swatch {

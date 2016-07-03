@@ -14,22 +14,22 @@ import makeReducer$ from './reducers';
 // - Add Hex/RGBA display
 // - Allow pasting in of Hex/RGBA
 // - Allow clicking on components (rather than just drag)
+// - Make the component emit a color$
+// - Test
+// - Publish to NPM
 
 function view (state) {
   return (
-    div('.container', [
-      div('.color-picker', [
-        renderSaturationInput(state),
-        renderHueInput(state),
-        renderAlphaInput(state)
-      ]),
-
+    div('.color-picker', [
+      renderSaturationInput(state),
+      renderHueInput(state),
+      renderAlphaInput(state),
       renderSwatch(state)
     ])
   );
 }
 
-export default function App ({DOM, Mouse}) {
+export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) {
   const initialState = {
     dragging: either(['none', 'hue', 'saturation', 'alpha'], 'none'),
 
@@ -40,13 +40,19 @@ export default function App ({DOM, Mouse}) {
     color: {h: 0, s: 0, v: 1, a: 1}
   };
 
-  const action$ = makeReducer$({DOM, Mouse});
+  const action$ = makeReducer$({DOM, Mouse, props$});
 
   const state$ = action$
     .startWith(initialState)
-    .scan((state, action) => action(state));
+    .scan((state, action) => action(state))
+    .shareReplay(1);
+
+  const color$ = state$.map(state => {
+    return tinycolor({...state.color, h: state.color.h * 360}).toRgbString();
+  }).distinctUntilChanged();
 
   return {
-    DOM: state$.map(view)
+    DOM: state$.map(view),
+    color$
   };
 }

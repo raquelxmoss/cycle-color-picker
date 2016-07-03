@@ -1,22 +1,28 @@
 import {run} from '@cycle/core';
-import {makeDOMDriver} from '@cycle/dom';
+import {div, makeDOMDriver} from '@cycle/dom';
 import {restart, restartable} from 'cycle-restart';
-import isolate from '@cycle/isolate';
+import {Observable} from 'rx';
 
 import mouse from './src/drivers/mouse-driver';
-var app = require('./src/app').default;
+var ColorPicker = require('./src/app').default;
 
 const drivers = {
-  DOM: restartable(makeDOMDriver('.app'), {pauseSinksWhileReplaying: false}),
+  DOM: makeDOMDriver('.app'),
   Mouse: mouse
 };
 
+function app (sources) {
+  const props$ = Observable.of({color: 'magenta'});
+  const colorPicker = ColorPicker({...sources, props$});
+
+  return {
+    DOM: colorPicker.color$.map(color =>
+      div('.app-container', {style: {background: color}}, [
+        colorPicker.DOM
+      ])
+    )
+  };
+}
+
 const {sinks, sources} = run(app, drivers);
 
-if (module.hot) {
-  module.hot.accept('./src/app', () => {
-    app = require('./src/app').default;
-
-    restart(app, drivers, {sinks, sources}, isolate);
-  });
-}

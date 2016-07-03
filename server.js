@@ -8,7 +8,6 @@ budo('./index.js', {
   port: 8000,
   stream: process.stdout,
   browserify: {
-    transform: babelify,
-    plugin: hotModuleReloading
+    transform: babelify
   }
 });

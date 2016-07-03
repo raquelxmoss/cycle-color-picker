@@ -10,14 +10,9 @@ export function containerBoundaries (state, event, type) {
   const left = event.pageX - containerLeft;
   const top = event.pageY - containerTop;
 
-  const isInBounds = left > 0 && top > 0 && left < containerWidth && top < containerHeight;
-
   return {
-    isInBounds,
     containerWidth,
     containerHeight,
-    containerLeft,
-    containerTop,
     top,
     left
   };
@@ -37,17 +32,14 @@ export function between (min, max, value) {
 
 export function either (values, currentValue) {
   return {
-    set: (newValue) => either(values, newValue),
-    when: (handlers) => {
-      if (currentValue in handlers) {
-        return handlers[currentValue]();
+    set: (newValue) => {
+      if (!values.find(value => value === newValue)) {
+        throw new Error(`newValue must be one of ${values.join(', ')}, got "${newValue}"`);
       }
 
-      if ('default' in handlers) {
-        return handlers['default']();
-      }
+      return either(values, newValue);
+    },
 
-      throw new Error(`No handler found for ${currentValue}`);
-    }
+    is: (value) => value === currentValue
   };
 }

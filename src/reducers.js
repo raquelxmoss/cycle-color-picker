@@ -1,106 +1,37 @@
 import {Observable} from 'rx';
 import {between, containerBoundaries} from './helpers';
+import tinycolor from 'tinycolor2';
 
-function updateSaturation (event) {
-  return function _updateSaturation(state) {
-    return state.dragging.when({
-      'saturation': () => {
-        const {
-          isInBounds,
-          containerLeft,
-          containerTop,
-          containerWidth,
-          containerHeight,
-          top,
-          left
-        } = containerBoundaries(state, event, 'saturation');
+function updateChannel (event, type, updateFunction) {
+  return function _updateChannel (state) {
+    if (!state.dragging.is(type)) { return state; }
 
-        if (!isInBounds) { return state; }
+    const {
+      containerWidth,
+      containerHeight,
+      top,
+      left
+    } = containerBoundaries(state, event, type);
 
-        const saturation = left / containerWidth;
-        const bright = 1 - (top / containerHeight);
+    const xRatio = between(0, containerWidth, left) / containerWidth;
+    const yRatio = between(0, containerHeight, top) / containerHeight;
 
-        return {
-          ...state,
+    return {
+      ...state,
 
-          color: {
-            ...state.color,
+      color: {
+        ...state.color,
 
-            s: saturation,
-            v: bright
-          }
-        };
-      },
-
-      'default': () => state
-    });
-  };
-}
-
-function updateAlpha (event) {
-  return function _updateAlpha(state) {
-    return state.dragging.when({
-      'alpha': () => {
-        const {
-          containerWidth,
-          left
-        } = containerBoundaries(state, event, 'alpha');
-
-        const a = (between(0, containerWidth, left) * 100 / containerWidth) / 100;
-
-        return {
-          ...state,
-
-          color: {
-            ...state.color,
-
-            a
-          }
-        }
-      },
-
-      'default': () => state
-    });
-  };
-}
-
-function updateHue (event) {
-  return function _updateHue(state) {
-    return state.dragging.when({
-      'hue': () => {
-        const {
-          containerWidth,
-          containerLeft,
-          left
-        } = containerBoundaries(state, event, 'hue');
-
-        const isInBounds = left > 0 && left < containerWidth;
-
-        if (!isInBounds) { return state; }
-
-        const percent = left * 100 / containerWidth;
-        const h = (360 * percent / 100);
-
-        return {
-          ...state,
-
-          color: {
-            ...state.color,
-
-            h
-          }
-        }
-      },
-
-      'default': () => state
-    });
+        ...updateFunction(xRatio, yRatio)
+      }
+    };
   };
 }
 
 const update = {
-  alpha: updateAlpha,
-  hue: updateHue,
-  saturation: updateSaturation
+  alpha: (event) => updateChannel(event, 'alpha', (x) => ({a: x})),
+  hue: (event) => updateChannel(event, 'hue', (x) => ({h: x})),
+  saturation: (event) => updateChannel(event, 'saturation', (x, y) => ({s: x, v: 1 - y}))
 };
 
 function makeInputElementReducer$ (name, DOM) {
@@ -119,9 +50,10 @@ function makeInputElementReducer$ (name, DOM) {
 
   const container$ = container
     .observable
+    .skip(1)
     .map(el => el[0].getBoundingClientRect())
     .map(value => state => ({...state, [`${name}Container`]: value}))
-    .take(1);
+    .sample(100);
 
   return Observable.merge(
     containerMouseDown$,
@@ -130,11 +62,31 @@ function makeInputElementReducer$ (name, DOM) {
   );
 }
 
-export default function makeReducer$ ({DOM, Mouse}) {
+function setStateFromProps (props) {
+  return function _setStateFromProps (state) {
+    if ('color' in props) {
+      props.color = tinycolor(props.color).toHsv();
+      props.color.h /= 360;
+    }
+
+    return {
+      ...state,
+
+      ...props
+    }
+  }
+}
+
+export default function makeReducer$ ({DOM, Mouse, props$}) {
   const mouseUp$ = Mouse.up()
     .map(ev => state => ({...state, dragging: state.dragging.set('none')}));
 
+  const setStateFromProps$ = props$
+    .map(setStateFromProps);
+
   return Observable.merge(
+    setStateFromProps$,
+
     mouseUp$,
     makeInputElementReducer$('saturation', DOM),
     makeInputElementReducer$('hue', DOM),

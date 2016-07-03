@@ -2,7 +2,7 @@ import tinycolor from 'tinycolor2';
 import {div} from '@cycle/dom';
 
 export function renderSaturationInput (state) {
-  const saturationBackground = `hsl(${state.color.h}, 100%, 50%)`;
+  const saturationBackground = `hsl(${state.color.h * 360}, 100%, 50%)`;
   const saturationIndicatorColor = tinycolor.mix('#fff', '#000', state.color.v * 100).toHexString();
 
   const saturationIndicatorStyle = {
@@ -23,9 +23,8 @@ export function renderSaturationInput (state) {
 }
 
 export function renderHueInput (state) {
-  const hueRatio = state.color.h / 360;
   const hueIndicatorStyle = {
-    left: `${state.hueContainer.width * hueRatio}px`
+    left: `${state.hueContainer.width * state.color.h}px`
   };
 
   return (
@@ -42,8 +41,10 @@ export function renderAlphaInput (state) {
     left: `${state.alphaContainer.width * state.color.a}px`
   };
 
-  const gradientStart = tinycolor(Object.assign({}, state.color)).setAlpha(0);
-  const gradientStyle = {background: `linear-gradient(to right, ${tinycolor(gradientStart).toRgbString()}  0%, ${tinycolor(tinycolor(Object.assign({}, state.color)).toHexString()).toRgbString()} 100%)`};
+  const color = tinycolor({...state.color, h: state.color.h * 360});
+
+  const gradientStart = color.clone().setAlpha(0);
+  const gradientStyle = {background: `linear-gradient(to right, ${tinycolor(gradientStart).toRgbString()}  0%, ${color.toHexString()} 100%)`};
 
   return (
     div('.alpha-container', [
@@ -57,7 +58,9 @@ export function renderAlphaInput (state) {
 }
 
 export function renderSwatch (state) {
-  const swatchBackground = tinycolor(Object.assign({}, state.color)).setAlpha(state.color.a);
+  const color = tinycolor({...state.color, h: state.color.h * 360});
+
+  const swatchBackground = color.clone().setAlpha(state.color.a);
   const swatchStyle = {background: tinycolor(swatchBackground).toRgbString()};
 
   return (
