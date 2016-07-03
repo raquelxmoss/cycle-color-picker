@@ -149,6 +149,18 @@ function updateAlpha (event) {
   };
 }
 
+const update = {
+  alpha: updateAlpha,
+  hue: updateHue,
+  saturation: updateSaturation
+};
+
+const updateIndicator = {
+  alpha: updateAlphaIndicatorPosition,
+  hue: updateHueIndicatorPosition,
+  saturation: updateSaturationIndicatorPosition
+};
+
 function view (state) {
   const saturationBackground = `hsl(${state.color.h}, 100%, 50%)`;
   const saturationIndicatorColor = tinycolor.mix('#fff', '#000', parseFloat(state.color.l)).toHexString();
@@ -206,71 +218,36 @@ export default function App ({DOM, Mouse}) {
       alphaIsDragging: false
     }));
 
-  const saturation = DOM
-    .select('.saturation');
+  function makeReducers (name) {
+    const container = DOM
+      .select(`.${name}`);
 
-  const saturationMouseDown$ = saturation
-    .events('mousedown')
-    .map(ev => state => Object.assign({}, state, {saturationIsDragging: true}));
+    const containerMouseDown$ = container
+      .events('mousedown')
+      .map(ev => state => Object.assign({}, state, {[`${name}IsDragging`]: true}));
 
-  const saturationMouseMove$ = saturation
-    .events('mousemove');
+    const containerMouseMove$ = container
+      .events('mousemove');
 
-  const updateSaturation$ = saturationMouseMove$
-    .map(ev => updateSaturation(event));
+    const update$ = containerMouseMove$
+      .map(ev => update[name](ev));
 
-  const updateSaturationIndicatorPosition$ = saturationMouseMove$
-    .map(ev => updateSaturationIndicatorPosition(ev));
+    const updateIndicatorPosition$ = containerMouseMove$
+      .map(ev => updateIndicator[name](ev));
 
-  const saturationContainerDimensions$ = saturation
-    .observable
-    .map(el => el[0].getBoundingClientRect())
-    .map(value => state => Object.assign({}, state, {saturationContainer: value}))
-    .take(1);
+    const container$ = container
+      .observable
+      .map(el => el[0].getBoundingClientRect())
+      .map(value => state => Object.assign({}, state, {[`${name}Container`]: value}))
+      .take(1);
 
-  const hue = DOM
-    .select('.hue');
-
-  const hueMouseDown$ = hue
-    .events('mousedown')
-    .map(ev => state => Object.assign({}, state, {hueIsDragging: true}));
-
-  const hueMouseMove$ = hue
-    .events('mousemove');
-
-  const updateHue$ = hueMouseMove$
-    .map(ev => updateHue(ev));
-
-  const updateHueIndicatorPosition$ = hueMouseMove$
-    .map(ev => updateHueIndicatorPosition(ev));
-
-  const hueContainer$ = hue
-    .observable
-    .map(el => el[0].getBoundingClientRect())
-    .map(value => state => Object.assign({}, state, {hueContainer: value}))
-    .take(1);
-
-  const alpha = DOM
-    .select('.alpha');
-
-  const alphaMouseDown$ = alpha
-    .events('mousedown')
-    .map(ev => state => Object.assign({}, state, {alphaIsDragging: true}));
-
-  const alphaMouseMove$ = alpha
-    .events('mousemove');
-
-  const updateAlpha$ = alphaMouseMove$
-    .map(ev => updateAlpha(ev));
-
-  const updateAlphaIndicatorPosition$ = alphaMouseMove$
-    .map(ev => updateAlphaIndicatorPosition(ev));
-
-  const alphaContainer$ = alpha
-    .observable
-    .map(el => el[0].getBoundingClientRect())
-    .map(value => state => Object.assign({}, state, {alphaContainer: value}))
-    .take(1);
+    return Observable.merge(
+      containerMouseDown$,
+      update$,
+      updateIndicatorPosition$,
+      container$
+    );
+  }
 
   const initialState = {
     saturationContainer: null,
@@ -297,18 +274,9 @@ export default function App ({DOM, Mouse}) {
 
   const action$ = Observable.merge(
     mouseUp$,
-    saturationMouseDown$,
-    updateSaturation$,
-    updateSaturationIndicatorPosition$,
-    saturationContainerDimensions$,
-    hueMouseDown$,
-    updateHue$,
-    updateHueIndicatorPosition$,
-    hueContainer$,
-    alphaMouseDown$,
-    updateAlpha$,
-    alphaContainer$,
-    updateAlphaIndicatorPosition$
+    makeReducers('saturation'),
+    makeReducers('hue'),
+    makeReducers('alpha')
   );
 
   const state$ = action$
