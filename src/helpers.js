@@ -34,3 +34,20 @@ export function between (min, max, value) {
 
   return value;
 }
+
+export function either (values, currentValue) {
+  return {
+    set: (newValue) => either(values, newValue),
+    when: (handlers) => {
+      if (currentValue in handlers) {
+        return handlers[currentValue]();
+      }
+
+      if ('default' in handlers) {
+        return handlers['default']();
+      }
+
+      throw new Error(`No handler found for ${currentValue}`);
+    }
+  };
+}
