@@ -19,6 +19,11 @@
     "rx"
   ],
   "author": "Raquel Moss",
+  "contributors": [
+    {
+      "name": "Nick Johnstone"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/raquelxmoss/cycle-color-picker/issues"
@@ -32,14 +37,15 @@
     "@cycle/core": "^6.0.0-rc2",
     "@cycle/dom": "^9.0.1",
     "@cycle/isolate": "^1.2.0",
-    "cycle-restart": "0.0.14",
-    "babel-preset-es2015": "^6.1.18",
     "babel-cli": "^6.2.0",
     "babel-core": "^6.2.1",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015": "^6.1.18",
     "babelify": "^7.2.0",
     "browserify": "^12.0.1",
     "browserify-hmr": "^0.3.1",
     "budo": "^6.1.0",
+    "cycle-restart": "0.0.14",
     "uglifyify": "^3.0.1"
   }
 }
