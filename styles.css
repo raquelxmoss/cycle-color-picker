@@ -7,8 +7,8 @@ html, body {
   font-family: Open sans, sans-serif;
 }
 
-input[type='text'] {
-  width: 20px;
+.rgba-input {
+  width: 30px;
 }
 
 .app {

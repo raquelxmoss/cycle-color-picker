@@ -26,6 +26,20 @@ import makeReducer$ from './reducers';
 // - allow HEX input to update the color
 // - allow user to switch to rgba input mode
 // - automatically switch to rgba input mode if alpha < 1
+//
+function renderRGBAElement (rgba, channel) {
+  return (
+    input('.rgba-input',
+      {
+        attributes: {
+          value: rgba[channel],
+          'data-channel': channel
+        }
+      }
+    )
+  );
+}
+
 function renderColorInput (state) {
   const format = state.colorInputFormat.value
   const color = tinycolor.fromRatio(state.color);
@@ -38,12 +52,13 @@ function renderColorInput (state) {
     return (
       div('.rgba', [
         span('r'),
-        input('.rgba-input', {
-          attributes: {
-            value: rgba.r,
-            'data-channel': 'r'
-          }
-        })
+        renderRGBAElement(rgba, 'r'),
+        span('g'),
+        renderRGBAElement(rgba, 'g'),
+        span('b'),
+        renderRGBAElement(rgba, 'b'),
+        span('a'),
+        renderRGBAElement(rgba, 'a')
       ])
     )
   }
