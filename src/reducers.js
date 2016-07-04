@@ -81,11 +81,19 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
   const mouseUp$ = Mouse.up()
     .map(ev => state => ({...state, dragging: state.dragging.set('none')}));
 
+  const setStateFromHexInput$ = DOM
+    .select('.hex-input')
+    .events('input')
+    .debounce(300)
+    .filter(ev => tinycolor(ev.target.value).isValid())
+    .map(ev => setStateFromProps({color: ev.target.value}));
+
   const setStateFromProps$ = props$
     .map(setStateFromProps);
 
   return Observable.merge(
     setStateFromProps$,
+    setStateFromHexInput$,
 
     mouseUp$,
     makeInputElementReducer$('saturation', DOM),
