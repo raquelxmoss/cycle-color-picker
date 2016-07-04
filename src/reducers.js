@@ -73,21 +73,80 @@ function setStateFromProps (props) {
       ...state,
 
       ...props
+    };
+  };
+}
+
+function setStateFromRGBAInput ({channel, value}) {
+  return function _setStateFromRGBAInput (state) {
+    const color = tinycolor.fromRatio(state.color).toRgb();
+    color[channel] = value;
+
+    const colorAsHex = tinycolor(color).toHexString();
+
+    if (tinycolor(colorAsHex).isValid()) {
+      const newColor = tinycolor(color).toHsv();
+      newColor.h /= 360;
+
+      return {
+        ...state,
+
+        color: newColor
+      };
     }
-  }
+
+    return state;
+  };
+}
+
+function changeColorInputFormat () {
+  return function _changeColorInputFormat (state) {
+    const inputFormats = ['rgba', 'hex'];
+    const currentFormat = state.colorInputFormat.value;
+
+    const newFormat = inputFormats.find(format => format !== currentFormat);
+    console.log(newFormat);
+
+    return Object.assign({}, state, {colorInputFormat: state.colorInputFormat.set(newFormat)});
+  };
 }
 
 export default function makeReducer$ ({DOM, Mouse, props$}) {
   const mouseUp$ = Mouse.up()
     .map(ev => state => ({...state, dragging: state.dragging.set('none')}));
 
+  const setStateFromHexInput$ = DOM
+    .select('.hex-input')
+    .events('input')
+    .debounce(300)
+    .filter(ev => tinycolor(ev.target.value).isValid())
+    .map(ev => setStateFromProps({color: ev.target.value}));
+
+  const setStateFromRGBAInput$ = DOM
+    .select('.rgba-input')
+    .events('input')
+    .debounce(300)
+    .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
+    .map(({channel, value}) => setStateFromRGBAInput({channel, value}));
+
+  const inputSwitcher$ = DOM
+    .select('.switcher')
+    .events('click');
+
+  const changeColorInputFormat$ = inputSwitcher$
+    .map(changeColorInputFormat);
+
   const setStateFromProps$ = props$
     .map(setStateFromProps);
 
   return Observable.merge(
     setStateFromProps$,
+    setStateFromHexInput$,
+    setStateFromRGBAInput$,
+    changeColorInputFormat$,
 
     mouseUp$,
+
     makeInputElementReducer$('saturation', DOM),
     makeInputElementReducer$('hue', DOM),
     makeInputElementReducer$('alpha', DOM)

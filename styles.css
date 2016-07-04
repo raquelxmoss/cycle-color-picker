@@ -7,6 +7,10 @@ html, body {
   font-family: Open sans, sans-serif;
 }
 
+.rgba-input {
+  width: 30px;
+}
+
 .app {
   height: 100%;
 }
@@ -19,6 +23,20 @@ html, body {
   height: 100%;
 }
 
+.input-switcher {
+  display: inline;
+  float: right;
+}
+
+.switcher {
+  border: 1px solid #888;
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+  color: #888;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 .container {
   position: relative;
@@ -42,6 +60,7 @@ html, body {
   height: 200px;
   width: 200px;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .color-overlay {

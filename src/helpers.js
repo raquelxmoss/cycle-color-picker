@@ -40,6 +40,7 @@ export function either (values, currentValue) {
       return either(values, newValue);
     },
 
-    is: (value) => value === currentValue
+    is: (value) => value === currentValue,
+    value: currentValue
   };
 }
