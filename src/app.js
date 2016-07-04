@@ -1,4 +1,4 @@
-import {input, div, button, p} from '@cycle/dom';
+import {div} from '@cycle/dom';
 import {Observable} from 'rx';
 import tinycolor from 'tinycolor2';
 
@@ -9,9 +9,8 @@ import makeReducer$ from './reducers';
 // TODO:
 // - Eat food (don't work on this while you're hungry)
 // - Fix indicators overshooting by 10px
-// - Pretty up the CSS
-// - Add Hex/RGBA display
-// - Allow pasting in of Hex/RGBA
+// - Pretty up the CSS (add SASS, move some things to JS, that kinda thing)
+// - Add Hex/RGBA/HSL to display
 // - Allow clicking on components (rather than just drag)
 // - Test
 // - Publish to NPM
