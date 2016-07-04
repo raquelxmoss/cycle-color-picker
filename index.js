@@ -1,6 +1,5 @@
 import {run} from '@cycle/core';
 import {div, makeDOMDriver} from '@cycle/dom';
-import {restart, restartable} from 'cycle-restart';
 import {Observable} from 'rx';
 
 import mouse from './src/drivers/mouse-driver';
