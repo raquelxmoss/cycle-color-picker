@@ -99,6 +99,18 @@ function setStateFromRGBAInput ({channel, value}) {
   };
 }
 
+function changeColorInputFormat () {
+  return function _changeColorInputFormat (state) {
+    const inputFormats = ['rgba', 'hex'];
+    const currentFormat = state.colorInputFormat.value;
+
+    const newFormat = inputFormats.find(format => format !== currentFormat);
+    console.log(newFormat);
+
+    return Object.assign({}, state, {colorInputFormat: state.colorInputFormat.set(newFormat)});
+  };
+}
+
 export default function makeReducer$ ({DOM, Mouse, props$}) {
   const mouseUp$ = Mouse.up()
     .map(ev => state => ({...state, dragging: state.dragging.set('none')}));
@@ -117,6 +129,13 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
     .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
     .map(({channel, value}) => setStateFromRGBAInput({channel, value}));
 
+  const inputSwitcher$ = DOM
+    .select('.switcher')
+    .events('click');
+
+  const changeColorInputFormat$ = inputSwitcher$
+    .map(changeColorInputFormat);
+
   const setStateFromProps$ = props$
     .map(setStateFromProps);
 
@@ -124,6 +143,7 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
     setStateFromProps$,
     setStateFromHexInput$,
     setStateFromRGBAInput$,
+    changeColorInputFormat$,
 
     mouseUp$,
 

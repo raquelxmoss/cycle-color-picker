@@ -1,4 +1,4 @@
-import {div} from '@cycle/dom';
+import {div, p} from '@cycle/dom';
 import {Observable} from 'rx';
 import tinycolor from 'tinycolor2';
 
@@ -30,6 +30,15 @@ import makeReducer$ from './reducers';
 // - Allow user to cycle through input modes
 // - automatically switch to rgba input mode if alpha < 1
 //
+function renderInputSwitcher (state) {
+  return (
+    div('.input-switcher', [
+      p('.switcher', '˄'),
+      p('.switcher', '˅')
+    ])
+  );
+}
+
 function view (state) {
   return (
     div('.color-picker', [
@@ -37,7 +46,8 @@ function view (state) {
       renderHueInput(state),
       renderAlphaInput(state),
       renderSwatch(state),
-      renderColorInput(state)
+      renderColorInput(state),
+      renderInputSwitcher(state)
     ])
   );
 }
