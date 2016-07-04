@@ -28,23 +28,24 @@ import makeReducer$ from './reducers';
 // - automatically switch to rgba input mode if alpha < 1
 function renderColorInput (state) {
   const format = state.colorInputFormat.value
-  const color = Object.assign({}, state.color);
+  const color = tinycolor.fromRatio(state.color);
 
   if (format === 'hex') {
     return input('.hex-input', {type: 'text', value: tinycolor(color).toHexString()})
   } else if (format === 'rgba') {
-    const rgba = tinycolor(color).toRgb();
+    const rgba = color.toRgb();
 
-    return div('.rgba-input', [
-      span('r'),
-      input('.rgba-r', {type: 'text', value: rgba.r}),
-      span('g'),
-      input('.rgba-g', {type: 'text', value: rgba.g}),
-      span('b'),
-      input('.rgba-b', {type: 'text', value: rgba.b}),
-      span('a'),
-      input('.rgba-a', {type: 'text', value: rgba.a.toFixed(2)})
-    ]);
+    return (
+      div('.rgba', [
+        span('r'),
+        input('.rgba-input', {
+          attributes: {
+            value: rgba.r,
+            'data-channel': 'r'
+          }
+        })
+      ])
+    )
   }
 }
 
@@ -69,7 +70,7 @@ export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) 
     alphaContainer: {width: 0},
 
     color: {h: 0, s: 0, v: 1, a: 1},
-    colorInputFormat: either(['hex', 'rgba', 'hsl'], 'hex')
+    colorInputFormat: either(['hex', 'rgba', 'hsla'], 'rgba')
   };
 
   const action$ = makeReducer$({DOM, Mouse, props$});
@@ -82,7 +83,7 @@ export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) 
 
   const color$ = state$.map(state => {
     return tinycolor({...state.color, h: state.color.h * 360}).toRgbString();
-  }).distinctUntilChanged();
+  }).distinctUntilChanged()
 
   return {
     DOM: state$.map(view),
