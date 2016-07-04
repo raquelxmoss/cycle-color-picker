@@ -13,7 +13,6 @@ const middleware = sass({
 var app = budo('./index.js', {
   serve: 'bundle.js',
   port: 8000,
-  live: '*.{html, scss}',
   stream: process.stdout,
   browserify: {
     transform: babelify
@@ -23,10 +22,6 @@ var app = budo('./index.js', {
 .live()
 .watch(['*.{html, scss}'])
 .on('watch', function (type, file) {
-  if (path.extname(file) === '.scss') {
-    app.reload('styles.css');
-  } else {
-    app.reload(file);
-  }
+  app.reload('styles.css');
 })
 .on('pending', () => app.reload());
