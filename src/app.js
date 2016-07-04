@@ -27,10 +27,7 @@ import makeReducer$ from './reducers';
 //
 //
 // TODO right now:
-// - render current color as HEX
-// - render current color as HEX in an input that can be copied from
-// - allow HEX input to update the color
-// - allow user to switch to rgba input mode
+// - Allow user to cycle through input modes
 // - automatically switch to rgba input mode if alpha < 1
 //
 function view (state) {
@@ -65,9 +62,11 @@ export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) 
     .shareReplay(1)
     .distinctUntilChanged(JSON.stringify);
 
-  const color$ = state$.map(state => {
-    return tinycolor({...state.color, h: state.color.h * 360}).toRgbString();
-  }).distinctUntilChanged();
+  const color$ = state$
+    .map(state => {
+      return tinycolor.fromRatio(state.color).toRgbString();
+    })
+    .distinctUntilChanged();
 
   return {
     DOM: state$.map(view),
