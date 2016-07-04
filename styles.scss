@@ -1,0 +1,161 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(204, 204, 204, 0.1);
+  font-family: Open sans, sans-serif;
+}
+
+.rgba-input {
+  width: 30px;
+}
+
+.app {
+  height: 100%;
+  border: 10px solid blue;
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+}
+
+
+
+.input-switcher {
+  display: inline;
+  float: right;
+}
+
+.switcher {
+  border: 1px solid #888;
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+  color: #888;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.container {
+  position: relative;
+}
+
+.color-picker {
+  background: #eee;
+  padding: 20px;
+  border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.298039) 0px 0px 2px, rgba(0, 0, 0, 0.298039) 0px 4px 8px;
+}
+
+.swatch {
+  margin: 10px;
+  width: 50px;
+  height: 50px;
+}
+
+.saturation {
+  position: relative;
+  height: 200px;
+  width: 200px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.color-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, #FFF, rgba(255, 255, 255, 0));
+  z-index: 2;
+}
+
+.black {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+  z-index: 3;
+}
+
+.color {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: #FF00E0;
+}
+
+.indicator {
+  position: absolute;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  border: 1px solid black;
+  z-index: 5;
+}
+
+.hue-container,
+.alpha-container {
+  position: relative;
+  margin-top: 10px;
+  height: 10px;
+}
+
+.hue {
+  background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+  height: 10px;
+  width: 100%;
+  position: absolute;
+  cursor: pointer;
+}
+
+.hue-indicator,
+.alpha-indicator {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+}
+
+.alpha {
+  height: 10px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.gradient-overlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+.checkerboard {
+  position: absolute;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  width: 200px;
+  height: 10px;
+  background: -webkit-linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), -webkit-linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), rgb(255, 255, 255);
+  background: -moz-linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), -moz-linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), rgb(255, 255, 255);
+  background: linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), linear-gradient(45deg, rgba(0,0,0,0.0980392) 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.0980392) 75%, rgba(0,0,0,0.0980392) 0), rgb(255, 255, 255);
+  background-position: 0 0, 5px 5px;
+  -webkit-background-origin: padding-box;
+  background-origin: padding-box;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-background-size: 10px 10px;
+  background-size: 10px 10px;
+}

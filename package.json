@@ -46,6 +46,7 @@
     "browserify-hmr": "^0.3.1",
     "budo": "^6.1.0",
     "cycle-restart": "0.0.14",
+    "node-sass-middleware": "^0.9.8",
     "uglifyify": "^3.0.1"
   }
 }
