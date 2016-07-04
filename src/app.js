@@ -1,20 +1,26 @@
-import {input, div, button, p, span} from '@cycle/dom';
+import {div} from '@cycle/dom';
 import {Observable} from 'rx';
 import tinycolor from 'tinycolor2';
 
 import {either} from './helpers';
-import {renderSaturationInput, renderHueInput, renderAlphaInput, renderSwatch} from './views';
+
+import {
+  renderSaturationInput,
+  renderHueInput,
+  renderAlphaInput,
+  renderSwatch,
+  renderColorInput
+} from './views';
+
 import makeReducer$ from './reducers';
 
 // TODO:
 // - Eat food (don't work on this while you're hungry)
 // - Tidy up calls to tinycolor and make sure they aren't mutating state. Also use tinycolor.fromRatio to simplify a bunch of shit.
 // - Fix indicators overshooting by 10px
-// - Pretty up the CSS
+// - Pretty up the CSS (add SASS, move some things to JS, that kinda thing)
 // - Add Hex/RGBA/HSL to display
 //  - Allow users to cycle between them
-//  - Make them copyable inputs
-// - Allow pasting in of Hex/RGBA
 // - Allow clicking on components (rather than just drag)
 // - Test
 // - Publish to NPM
@@ -27,43 +33,6 @@ import makeReducer$ from './reducers';
 // - allow user to switch to rgba input mode
 // - automatically switch to rgba input mode if alpha < 1
 //
-function renderRGBAElement (rgba, channel) {
-  return (
-    input('.rgba-input',
-      {
-        attributes: {
-          value: rgba[channel],
-          'data-channel': channel
-        }
-      }
-    )
-  );
-}
-
-function renderColorInput (state) {
-  const format = state.colorInputFormat.value
-  const color = tinycolor.fromRatio(state.color);
-
-  if (format === 'hex') {
-    return input('.hex-input', {type: 'text', value: tinycolor(color).toHexString()})
-  } else if (format === 'rgba') {
-    const rgba = color.toRgb();
-
-    return (
-      div('.rgba', [
-        span('r'),
-        renderRGBAElement(rgba, 'r'),
-        span('g'),
-        renderRGBAElement(rgba, 'g'),
-        span('b'),
-        renderRGBAElement(rgba, 'b'),
-        span('a'),
-        renderRGBAElement(rgba, 'a')
-      ])
-    )
-  }
-}
-
 function view (state) {
   return (
     div('.color-picker', [
@@ -98,7 +67,7 @@ export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) 
 
   const color$ = state$.map(state => {
     return tinycolor({...state.color, h: state.color.h * 360}).toRgbString();
-  }).distinctUntilChanged()
+  }).distinctUntilChanged();
 
   return {
     DOM: state$.map(view),

@@ -73,14 +73,14 @@ function setStateFromProps (props) {
       ...state,
 
       ...props
-    }
-  }
+    };
+  };
 }
 
 function setStateFromRGBAInput ({channel, value}) {
   return function _setStateFromRGBAInput (state) {
     const color = tinycolor.fromRatio(state.color).toRgb();
-    color[channel] = value
+    color[channel] = value;
 
     const colorAsHex = tinycolor(color).toHexString();
 
@@ -92,11 +92,11 @@ function setStateFromRGBAInput ({channel, value}) {
         ...state,
 
         color: newColor
-      }
+      };
     }
 
     return state;
-  }
+  };
 }
 
 export default function makeReducer$ ({DOM, Mouse, props$}) {
@@ -116,7 +116,6 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
     .debounce(300)
     .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
     .map(({channel, value}) => setStateFromRGBAInput({channel, value}));
-
 
   const setStateFromProps$ = props$
     .map(setStateFromProps);

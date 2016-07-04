@@ -1,8 +1,45 @@
 import tinycolor from 'tinycolor2';
-import {div} from '@cycle/dom';
+import {div, input, span} from '@cycle/dom';
+
+function renderRGBAElement (rgba, channel) {
+  return (
+    input('.rgba-input',
+      {
+        attributes: {
+          value: rgba[channel],
+          'data-channel': channel
+        }
+      }
+    )
+  );
+}
+
+export function renderColorInput (state) {
+  const format = state.colorInputFormat.value;
+  const color = tinycolor.fromRatio(state.color);
+
+  if (format === 'hex') {
+    return input('.hex-input', {type: 'text', value: tinycolor(color).toHexString()});
+  } else if (format === 'rgba') {
+    const rgba = color.toRgb();
+
+    return (
+      div('.rgba', [
+        span('r'),
+        renderRGBAElement(rgba, 'r'),
+        span('g'),
+        renderRGBAElement(rgba, 'g'),
+        span('b'),
+        renderRGBAElement(rgba, 'b'),
+        span('a'),
+        renderRGBAElement(rgba, 'a')
+      ])
+    );
+  }
+}
 
 export function renderSaturationInput (state) {
-  const saturationBackground = `hsl(${state.color.h * 360}, 100%, 50%)`;
+  const saturationBackground = tinycolor.fromRatio(state.color).toRgbString();
   const saturationIndicatorColor = tinycolor.mix('#fff', '#000', state.color.v * 100).toHexString();
 
   const saturationIndicatorStyle = {
@@ -41,7 +78,7 @@ export function renderAlphaInput (state) {
     left: `${state.alphaContainer.width * state.color.a}px`
   };
 
-  const color = tinycolor({...state.color, h: state.color.h * 360});
+  const color = tinycolor.fromRatio(state.color);
 
   const gradientStart = color.clone().setAlpha(0);
   const gradientStyle = {background: `linear-gradient(to right, ${tinycolor(gradientStart).toRgbString()}  0%, ${color.toHexString()} 100%)`};
@@ -58,7 +95,7 @@ export function renderAlphaInput (state) {
 }
 
 export function renderSwatch (state) {
-  const color = tinycolor({...state.color, h: state.color.h * 360});
+  const color = tinycolor.fromRatio(state.color);
 
   const swatchBackground = color.clone().setAlpha(state.color.a);
   const swatchStyle = {background: tinycolor(swatchBackground).toRgbString()};
