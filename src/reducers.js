@@ -38,15 +38,30 @@ function makeInputElementReducer$ (name, DOM) {
   const container = DOM
     .select(`.${name}`);
 
+  const containerClick$ = container
+    .events('click');
+
   const containerMouseDown$ = container
-    .events('mousedown')
-    .map(ev => state => Object.assign({}, state, {dragging: state.dragging.set(name)}));
+    .events('mousedown');
+
+  const isDragging$ = Observable.merge(
+    containerMouseDown$,
+    containerClick$
+  )
+  .map(ev => state => Object.assign({}, state, {dragging: state.dragging.set(name)}));
+
+  const isNotDragging$ = containerClick$
+    .delay(200)
+    .map(ev => state => Object.assign({}, state, {dragging: state.dragging.set('none')}));
 
   const containerMouseMove$ = container
     .events('mousemove');
 
-  const update$ = containerMouseMove$
-    .map(ev => update[name](ev));
+  const update$ = Observable.merge(
+    containerMouseMove$,
+    containerClick$
+  )
+  .map(ev => update[name](ev));
 
   const container$ = container
     .observable
@@ -56,7 +71,8 @@ function makeInputElementReducer$ (name, DOM) {
     .sample(100);
 
   return Observable.merge(
-    containerMouseDown$,
+    isDragging$,
+    isNotDragging$,
     update$,
     container$
   );
