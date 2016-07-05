@@ -4,7 +4,7 @@ import tinycolor from 'tinycolor2';
 
 function updateChannel (event, type, updateFunction) {
   return function _updateChannel (state) {
-    if (!state.dragging.is(type)) { return state; }
+    if (!state.activeInput.is(type)) { return state; }
 
     const {
       containerWidth,
@@ -38,28 +38,28 @@ function makeInputElementReducer$ (name, DOM) {
   const container = DOM
     .select(`.${name}`);
 
-  const containerClick$ = container
+  const click$ = container
     .events('click');
 
-  const containerMouseDown$ = container
+  const mouseDown$ = container
     .events('mousedown');
 
-  const isDragging$ = Observable.merge(
-    containerMouseDown$,
-    containerClick$
+  const activeInput$ = Observable.merge(
+    mouseDown$,
+    click$
   )
-  .map(ev => state => Object.assign({}, state, {dragging: state.dragging.set(name)}));
+  .map(ev => state => Object.assign({}, state, {activeInput: state.activeInput.set(name)}));
 
-  const isNotDragging$ = containerClick$
+  const deactivateInput$ = click$
     .delay(200)
-    .map(ev => state => Object.assign({}, state, {dragging: state.dragging.set('none')}));
+    .map(ev => state => Object.assign({}, state, {activeInput: state.activeInput.set('none')}));
 
-  const containerMouseMove$ = container
+  const mouseMove$ = container
     .events('mousemove');
 
   const update$ = Observable.merge(
-    containerMouseMove$,
-    containerClick$
+    mouseMove$,
+    click$
   )
   .map(ev => update[name](ev));
 
@@ -71,8 +71,8 @@ function makeInputElementReducer$ (name, DOM) {
     .sample(100);
 
   return Observable.merge(
-    isDragging$,
-    isNotDragging$,
+    activeInput$,
+    deactivateInput$,
     update$,
     container$
   );
@@ -129,7 +129,7 @@ function changeColorInputFormat () {
 
 export default function makeReducer$ ({DOM, Mouse, props$}) {
   const mouseUp$ = Mouse.up()
-    .map(ev => state => ({...state, dragging: state.dragging.set('none')}));
+    .map(ev => state => ({...state, dragging: state.activeInput.set('none')}));
 
   const setStateFromHexInput$ = DOM
     .select('.hex-input')

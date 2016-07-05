@@ -48,7 +48,7 @@ export function renderInputSwitcher (state) {
 
 export function renderSaturationInput (state) {
   const saturationBackground = `hsl(${state.color.h * 360}, 100%, 50%)`;
-  const saturationIndicatorColor = tinycolor.mix('#fff', '#000', state.color.v * 100).toHexString();
+  const saturationIndicatorColor = state.color.v < 0.5 ? '#fff' : '#000';
 
   const saturationIndicatorStyle = {
     // TODO - calculate offset for centering

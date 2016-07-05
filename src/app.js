@@ -52,7 +52,7 @@ function view (state) {
 
 export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) {
   const initialState = {
-    dragging: either(['none', 'hue', 'saturation', 'alpha'], 'none'),
+    activeInput: either(['none', 'hue', 'saturation', 'alpha'], 'none'),
 
     saturationContainer: {width: 0, height: 0},
     hueContainer: {width: 0},
