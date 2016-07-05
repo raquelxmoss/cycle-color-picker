@@ -3,14 +3,17 @@ import {div, input, span, p} from '@cycle/dom';
 
 function renderRGBAElement (rgba, channel) {
   return (
-    input('.rgba-input',
-      {
-        attributes: {
-          value: rgba[channel],
-          'data-channel': channel
+    div('.rgba-input-container', [
+      input('.rgba-input',
+        {
+          attributes: {
+            value: rgba[channel],
+            'data-channel': channel
+          }
         }
-      }
-    )
+      ),
+      span(channel)
+    ])
   );
 }
 
@@ -25,13 +28,9 @@ export function renderColorInput (state) {
 
     return (
       div('.rgba', [
-        span('r'),
         renderRGBAElement(rgba, 'r'),
-        span('g'),
         renderRGBAElement(rgba, 'g'),
-        span('b'),
         renderRGBAElement(rgba, 'b'),
-        span('a'),
         renderRGBAElement(rgba, 'a')
       ])
     );
@@ -41,8 +40,8 @@ export function renderColorInput (state) {
 export function renderInputSwitcher (state) {
   return (
     div('.input-switcher', [
-      p('.switcher', '˄'),
-      p('.switcher', '˅')
+      p('.switcher .switcher-up'),
+      p('.switcher .switcher-down')
     ])
   );
 }

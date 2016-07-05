@@ -40,8 +40,10 @@ function view (state) {
           renderAlphaInput(state)
         ])
       ]),
-      renderColorInput(state),
-      renderInputSwitcher(state)
+      div('.inputs-container', [
+        renderColorInput(state),
+        renderInputSwitcher(state)
+      ])
     ])
   );
 }
