@@ -121,7 +121,6 @@ function changeColorInputFormat () {
     const currentFormat = state.colorInputFormat.value;
 
     const newFormat = inputFormats.find(format => format !== currentFormat);
-    console.log(newFormat);
 
     return Object.assign({}, state, {colorInputFormat: state.colorInputFormat.set(newFormat)});
   };
