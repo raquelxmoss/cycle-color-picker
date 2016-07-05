@@ -33,9 +33,13 @@ function view (state) {
   return (
     div('.color-picker', [
       renderSaturationInput(state),
-      renderHueInput(state),
-      renderAlphaInput(state),
-      renderSwatch(state),
+      div('.controls-container', [
+        renderSwatch(state),
+        div('.sliders', [
+          renderHueInput(state),
+          renderAlphaInput(state)
+        ])
+      ]),
       renderColorInput(state),
       renderInputSwitcher(state)
     ])

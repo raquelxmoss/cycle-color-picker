@@ -70,7 +70,7 @@ export function renderSaturationInput (state) {
 
 export function renderHueInput (state) {
   const hueIndicatorStyle = {
-    left: `${state.hueContainer.width * state.color.h}px`
+    left: `${state.hueContainer.width * state.color.h - 5}px`
   };
 
   return (
@@ -84,7 +84,7 @@ export function renderHueInput (state) {
 
 export function renderAlphaInput (state) {
   const alphaIndicatorStyle = {
-    left: `${state.alphaContainer.width * state.color.a}px`
+    left: `${state.alphaContainer.width * state.color.a - 5}px`
   };
 
   const color = tinycolor.fromRatio(state.color);

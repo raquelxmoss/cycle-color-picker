@@ -4,7 +4,7 @@
   "description": "A color picker component for Cycle.js",
   "main": "index.js",
   "scripts": {
-    "start": "babel-node server.js",
+    "start": "babel-node server.js --live",
     "test": "mocha --compilers js:babel-register",
     "bundle": "browserify index.js -t babelify -t uglifyify -o bundle.js"
   },

@@ -13,6 +13,7 @@ const middleware = sass({
 var app = budo('./index.js', {
   serve: 'bundle.js',
   port: 8000,
+  live: '*.{html, css}',
   stream: process.stdout,
   browserify: {
     transform: babelify
@@ -20,7 +21,7 @@ var app = budo('./index.js', {
   middleware: middleware
 })
 .live()
-.watch(['*.{html, scss}'])
+.watch(['*.{html, css}'])
 .on('watch', function (type, file) {
   app.reload('styles.css');
 })
