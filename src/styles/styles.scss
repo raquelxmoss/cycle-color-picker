@@ -1,0 +1,68 @@
+@import 'swatch';
+@import 'rgba-input';
+@import 'sliders';
+@import 'switcher';
+@import 'saturation';
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(204, 204, 204, 0.1);
+  font-family: Open sans, sans-serif;
+}
+
+.container {
+  position: relative;
+}
+
+.app {
+  height: 100%;
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+}
+
+.controls-container {
+  padding: 10px 15px;;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+}
+
+.inputs-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15px 10px;
+  text-transform: uppercase;
+  color: #888;
+  font-size: 0.7em;
+
+  .hex-input {
+    width: 100%;
+    margin: 0px 20px;
+    border: none;
+    padding: 8px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+}
+
+.color-picker {
+  width: 225px;
+  background: #eee;
+  border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.298039) 0px 0px 2px, rgba(0, 0, 0, 0.298039) 0px 4px 8px;
+}
+
+
+
+

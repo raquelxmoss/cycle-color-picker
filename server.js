@@ -4,13 +4,13 @@ import sass from 'node-sass-middleware';
 import path from 'path';
 
 const middleware = sass({
-  src: __dirname,
+  src: path.join(__dirname, 'src', 'styles'),
   dest: __dirname,
   debug: true,
-  outputStyle: 'compressed'
+  outputStyle: 'extended'
 });
 
-var app = budo('./index.js', {
+budo('./index.js', {
   serve: 'bundle.js',
   port: 8000,
   live: '*.{html, css}',
@@ -19,10 +19,5 @@ var app = budo('./index.js', {
     transform: babelify
   },
   middleware: middleware
-})
-.live()
-.watch(['*.{html, css}'])
-.on('watch', function (type, file) {
-  app.reload('styles.css');
-})
-.on('pending', () => app.reload());
+});
+

@@ -17,18 +17,20 @@ import makeReducer$ from './reducers';
 
 // TODO:
 // - Eat food (don't work on this while you're hungry)
-// - Tidy up calls to tinycolor and make sure they aren't mutating state. Also use tinycolor.fromRatio to simplify a bunch of shit.
-// - Fix indicators overshooting by 10px
-// - Pretty up the CSS (add SASS, move some things to JS, that kinda thing)
-// - Add Hex/RGBA/HSL to display
+// - Fix indicators overshooting by 10px (transform translate in the CSS)
+// - Make scss more sensible and split into files
+// - Add support for HSLA input
 // - Allow clicking on components (rather than just drag)
 // - Test
+// - Make sure bundle works
 // - Publish to NPM
 //
+// TODO refactors:
+// - Tidy up inputs and switcher stuff, it's quite naive at the moment, it could be abstracted more
 //
-// TODO right now:
+// TODO would be really nice but not entirely MVP:
 // - automatically switch to rgba input mode if alpha < 1
-//
+
 function view (state) {
   return (
     div('.color-picker', [
