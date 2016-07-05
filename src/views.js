@@ -107,9 +107,13 @@ export function renderSwatch (state) {
   const color = tinycolor.fromRatio(state.color);
 
   const swatchBackground = color.clone().setAlpha(state.color.a);
-  const swatchStyle = {background: tinycolor(swatchBackground).toRgbString()};
+  const swatchStyle = {'background-color': tinycolor(swatchBackground).toRgbString()};
 
   return (
-    div('.swatch', {style: swatchStyle})
+    div('.swatch', [
+      div('.swatch-underlay', [
+        div('.swatch-color', {style: swatchStyle})
+      ])
+    ])
   );
 }
