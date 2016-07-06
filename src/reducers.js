@@ -101,7 +101,6 @@ const updateColorFromInput = {
 
 function getColorFromHex (hex) {
   const color = tinycolor(hex).toHsv();
-  color.h /= 360;
 
   return color;
 }
@@ -110,11 +109,11 @@ function getColorFromRGBA (state, channel, value) {
   const color = tinycolor.fromRatio(state.color).toRgb();
   color[channel] = value;
 
-  return tinycolor(color).toHsv();
+  return color;
 }
 
 function getColorFromHSLA (state, channel, value) {
-  const color = state.color;
+  const color = tinycolor.fromRatio(state.color).toHsl();
   color[channel] = value;
 
   return color;
@@ -140,12 +139,10 @@ function setStateFromInput ({channel, value}) {
   };
 }
 
-function changeColorInputFormat () {
+function changeColorInputFormat (clickCount) {
   return function _changeColorInputFormat (state) {
-    const inputFormats = ['rgba', 'hex'];
-    const currentFormat = state.colorInputFormat.value;
-
-    const newFormat = inputFormats.find(format => format !== currentFormat);
+    const inputFormats = ['rgba', 'hex', 'hsla'];
+    const newFormat = inputFormats[clickCount % inputFormats.length];
 
     return Object.assign({}, state, {colorInputFormat: state.colorInputFormat.set(newFormat)});
   };
@@ -178,7 +175,9 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
 
   const inputSwitcher$ = DOM
     .select('.switcher')
-    .events('click');
+    .events('click')
+    .map(ev => +1)
+    .scan((total, curr) => total + curr);
 
   const changeColorInputFormat$ = inputSwitcher$
     .map(changeColorInputFormat);

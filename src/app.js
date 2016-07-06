@@ -19,7 +19,8 @@ import makeReducer$ from './reducers';
 // - Eat food (don't work on this while you're hungry)
 // - Fix indicators overshooting by 10px (transform translate in the CSS)
 // - Make scss more sensible
-// - Add support for HSLA input
+// - DRY up how the inputs work
+// - ADD SOME CONSTANTS
 // - Test
 // - Make sure bundle works
 // - Publish to NPM
@@ -58,7 +59,7 @@ export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) 
     alphaContainer: {width: 0},
 
     color: {h: 0, s: 0, v: 1, a: 1},
-    colorInputFormat: either(['hex', 'rgba', 'hsla'], 'hsla')
+    colorInputFormat: either(['hex', 'rgba', 'hsla'], 'hex')
   };
 
   const action$ = makeReducer$({DOM, Mouse, props$});
