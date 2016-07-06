@@ -169,6 +169,13 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
     .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
     .map(({channel, value}) => setStateFromInput({channel, value}));
 
+  const setStateFromHSLAInput$ = DOM
+    .select('.hsla-input')
+    .events('input')
+    .debounce(300)
+    .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
+    .map(({channel, value}) => setStateFromInput({channel, value}));
+
   const inputSwitcher$ = DOM
     .select('.switcher')
     .events('click');
@@ -183,6 +190,7 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
     setStateFromProps$,
     setStateFromHexInput$,
     setStateFromRGBAInput$,
+    setStateFromHSLAInput$,
     changeColorInputFormat$,
 
     mouseUp$,

@@ -17,6 +17,22 @@ function renderRGBAElement (rgba, channel) {
   );
 }
 
+function renderHSLAElement (hsla, channel) {
+  return (
+    div('.hsla-input-container', [
+      input('.hsla-input',
+        {
+          attributes: {
+            value: hsla[channel],
+            'data-channel': channel
+          }
+        }
+      ),
+      span(channel)
+    ])
+  );
+}
+
 export function renderColorInput (state) {
   const format = state.colorInputFormat.value;
   const color = tinycolor.fromRatio(state.color);
@@ -32,6 +48,17 @@ export function renderColorInput (state) {
         renderRGBAElement(rgba, 'g'),
         renderRGBAElement(rgba, 'b'),
         renderRGBAElement(rgba, 'a')
+      ])
+    );
+  } else if (format === 'hsla') {
+    const hsla = color.toHsl();
+
+    return (
+      div('.hsla', [
+        renderHSLAElement(hsla, 'h'),
+        renderHSLAElement(hsla, 's'),
+        renderHSLAElement(hsla, 'l'),
+        renderHSLAElement(hsla, 'a')
       ])
     );
   }

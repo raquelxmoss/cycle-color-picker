@@ -58,7 +58,7 @@ export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) 
     alphaContainer: {width: 0},
 
     color: {h: 0, s: 0, v: 1, a: 1},
-    colorInputFormat: either(['hex', 'rgba', 'hsla'], 'rgba')
+    colorInputFormat: either(['hex', 'rgba', 'hsla'], 'hsla')
   };
 
   const action$ = makeReducer$({DOM, Mouse, props$});
