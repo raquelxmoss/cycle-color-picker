@@ -10,12 +10,12 @@
   }
 
   &-up {
-    background: url('/src/icons/arrow-up.svg');
+    background: url('./src/icons/arrow-up.svg');
     background-size: 20px;
   }
 
   &-down {
-    background: url('/src/icons/arrow-down.svg');
+    background: url('./src/icons/arrow-down.svg');
     background-size: 20px;
   }
 }

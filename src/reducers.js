@@ -93,21 +93,46 @@ function setStateFromProps (props) {
   };
 }
 
-function setStateFromRGBAInput ({channel, value}) {
-  return function _setStateFromRGBAInput (state) {
-    const color = tinycolor.fromRatio(state.color).toRgb();
-    color[channel] = value;
+const updateColorFromInput = {
+  hex: (state, channel, value) => getColorFromHex(value),
+  rgba: (state, channel, value) => getColorFromRGBA(state, channel, value),
+  hsla: (state, channel, value) => getColorFromHSLA(state, channel, value)
+};
 
-    const colorAsHex = tinycolor(color).toHexString();
+function getColorFromHex (hex) {
+  const color = tinycolor(hex).toHsv();
+  color.h /= 360;
+
+  return color;
+}
+
+function getColorFromRGBA (state, channel, value) {
+  const color = tinycolor.fromRatio(state.color).toRgb();
+  color[channel] = value;
+
+  return tinycolor(color).toHsv();
+}
+
+function getColorFromHSLA (state, channel, value) {
+  const color = state.color;
+  color[channel] = value;
+
+  return color;
+}
+
+function setStateFromInput ({channel, value}) {
+  return function _setStateFromInput (state) {
+    const newColor = updateColorFromInput[state.colorInputFormat.value](state, channel, value);
+    const colorAsHex = tinycolor(newColor).toHexString();
 
     if (tinycolor(colorAsHex).isValid()) {
-      const newColor = tinycolor(color).toHsv();
-      newColor.h /= 360;
+      const color = tinycolor(newColor).toHsv();
+      color.h /= 360;
 
       return {
         ...state,
 
-        color: newColor
+        color
       };
     }
 
@@ -128,21 +153,21 @@ function changeColorInputFormat () {
 
 export default function makeReducer$ ({DOM, Mouse, props$}) {
   const mouseUp$ = Mouse.up()
-    .map(ev => state => ({...state, dragging: state.activeInput.set('none')}));
+    .map(ev => state => ({...state, activeInput: state.activeInput.set('none')}));
 
   const setStateFromHexInput$ = DOM
     .select('.hex-input')
     .events('input')
     .debounce(300)
     .filter(ev => tinycolor(ev.target.value).isValid())
-    .map(ev => setStateFromProps({color: ev.target.value}));
+    .map(ev => setStateFromInput({value: ev.target.value}));
 
   const setStateFromRGBAInput$ = DOM
     .select('.rgba-input')
     .events('input')
     .debounce(300)
     .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
-    .map(({channel, value}) => setStateFromRGBAInput({channel, value}));
+    .map(({channel, value}) => setStateFromInput({channel, value}));
 
   const inputSwitcher$ = DOM
     .select('.switcher')

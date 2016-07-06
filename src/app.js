@@ -18,9 +18,8 @@ import makeReducer$ from './reducers';
 // TODO:
 // - Eat food (don't work on this while you're hungry)
 // - Fix indicators overshooting by 10px (transform translate in the CSS)
-// - Make scss more sensible and split into files
+// - Make scss more sensible
 // - Add support for HSLA input
-// - Allow clicking on components (rather than just drag)
 // - Test
 // - Make sure bundle works
 // - Publish to NPM
