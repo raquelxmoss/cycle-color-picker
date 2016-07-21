@@ -11,7 +11,7 @@ const drivers = {
 };
 
 function app (sources) {
-  const props$ = Observable.of({color: 'magenta'});
+  const props$ = Observable.of({color: '#47C3AC'});
   const colorPicker = ColorPicker({...sources, props$});
 
   return {
