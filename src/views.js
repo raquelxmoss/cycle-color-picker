@@ -1,67 +1,53 @@
 import tinycolor from 'tinycolor2';
+import _ from 'lodash';
 import {div, input, span, p} from '@cycle/dom';
 
-function renderRGBAElement (rgba, channel) {
+const colorInputViews = {
+  hex: (color) => renderHexInputElement(color.toHexString()),
+  rgba: (color) => renderColorInputElement(color.toRgb()),
+  hsla: (color) => renderColorInputElement(color.toHsl())
+};
+
+function makeInputElement (inputType, color, channel) {
   return (
-    div('.rgba-input-container', [
-      input('.rgba-input',
-        {
-          attributes: {
-            value: rgba[channel],
-            'data-channel': channel
-          }
+    input(
+      `.${inputType}-input .color-input`,
+      {
+        attributes: {
+          value: color[channel],
+          'data-channel': channel
         }
-      ),
-      span(channel)
-    ])
+      }
+    )
   );
 }
 
-function renderHSLAElement (hsla, channel) {
+function renderColorInputElement (color) {
+  const inputType = Object.keys(color).join('');
+
   return (
-    div('.hsla-input-container', [
-      input('.hsla-input',
-        {
-          attributes: {
-            value: hsla[channel],
-            'data-channel': channel
-          }
-        }
-      ),
-      span(channel)
-    ])
+      div('.color-input-container',
+      _.map(color, (value, channel) => {
+        return div('.channel-container', [
+          makeInputElement(inputType, color, channel),
+          span(channel)
+        ]);
+      })
+    )
   );
+}
+
+function renderHexInputElement (color) {
+  return input('.hex-input', {type: 'text', value: color});
 }
 
 export function renderColorInput (state) {
   const format = state.colorInputFormat.value;
   const color = tinycolor.fromRatio(state.color);
 
-  if (format === 'hex') {
-    return input('.hex-input', {type: 'text', value: tinycolor(color).toHexString()});
-  } else if (format === 'rgba') {
-    const rgba = color.toRgb();
-
-    return (
-      div('.rgba', [
-        renderRGBAElement(rgba, 'r'),
-        renderRGBAElement(rgba, 'g'),
-        renderRGBAElement(rgba, 'b'),
-        renderRGBAElement(rgba, 'a')
-      ])
-    );
-  } else if (format === 'hsla') {
-    const hsla = color.toHsl();
-
-    return (
-      div('.hsla', [
-        renderHSLAElement(hsla, 'h'),
-        renderHSLAElement(hsla, 's'),
-        renderHSLAElement(hsla, 'l'),
-        renderHSLAElement(hsla, 'a')
-      ])
-    );
-  }
+  return div('.color-display', [
+    colorInputViews[format](color)
+  ]);
 }
 
 export function renderInputSwitcher (state) {

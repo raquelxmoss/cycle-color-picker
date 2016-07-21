@@ -21,6 +21,7 @@ import makeReducer$ from './reducers';
 // - Make scss more sensible
 // - DRY up how the inputs work
 // - ADD SOME CONSTANTS
+// - HSLA/RGBA display -- format to 2 decimal places
 // - Test
 // - Make sure bundle works
 // - Publish to NPM

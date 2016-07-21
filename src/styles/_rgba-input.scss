@@ -1,14 +1,18 @@
-.rgba {
+.color-display {
   display: flex;
   width: 90%;
 
-  .rgba-input-container {
+  .color-input-container {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 
-    .rgba-input {
+    .channel-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .color-input {
       width: 70%;
       height: 20px;
       text-align: center;
@@ -18,3 +22,4 @@
     }
   }
 }
+
