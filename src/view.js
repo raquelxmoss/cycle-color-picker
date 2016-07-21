@@ -41,7 +41,7 @@ function renderHexInputElement (color) {
   return input('.hex-input', {type: 'text', value: color});
 }
 
-export function renderColorInput (state) {
+function renderColorInputs (state) {
   const format = state.colorInputFormat.value;
   const color = tinycolor.fromRatio(state.color);
 
@@ -50,7 +50,7 @@ export function renderColorInput (state) {
   ]);
 }
 
-export function renderInputSwitcher (state) {
+function renderInputSwitcher (state) {
   return (
     div('.input-switcher', [
       p('.switcher .switcher-up'),
@@ -59,7 +59,7 @@ export function renderInputSwitcher (state) {
   );
 }
 
-export function renderSaturationInput (state) {
+function renderSaturationInput (state) {
   const saturationBackground = `hsl(${state.color.h * 360}, 100%, 50%)`;
   const saturationIndicatorColor = state.color.v < 0.5 ? '#fff' : '#000';
 
@@ -79,7 +79,7 @@ export function renderSaturationInput (state) {
   );
 }
 
-export function renderHueInput (state) {
+function renderHueInput (state) {
   const hueIndicatorStyle = {
     left: `${state.hueContainer.width * state.color.h}px`
   };
@@ -93,7 +93,7 @@ export function renderHueInput (state) {
   );
 }
 
-export function renderAlphaInput (state) {
+function renderAlphaInput (state) {
   const alphaIndicatorStyle = {
     left: `${state.alphaContainer.width * state.color.a}px`
   };
@@ -114,7 +114,7 @@ export function renderAlphaInput (state) {
   );
 }
 
-export function renderSwatch (state) {
+function renderSwatch (state) {
   const color = tinycolor.fromRatio(state.color);
 
   const swatchBackground = color.clone().setAlpha(state.color.a);
@@ -124,6 +124,25 @@ export function renderSwatch (state) {
     div('.swatch', [
       div('.swatch-underlay', [
         div('.swatch-color', {style: swatchStyle})
+      ])
+    ])
+  );
+}
+
+export default function view (state) {
+  return (
+    div('.color-picker', [
+      renderSaturationInput(state),
+      div('.controls-container', [
+        renderSwatch(state),
+        div('.sliders', [
+          renderHueInput(state),
+          renderAlphaInput(state)
+        ])
+      ]),
+      div('.inputs-container', [
+        renderColorInputs(state),
+        renderInputSwitcher(state)
       ])
     ])
   );

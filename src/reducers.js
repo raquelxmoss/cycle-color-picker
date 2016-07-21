@@ -153,7 +153,11 @@ function changeColorInputFormat (clickCount) {
     const inputFormats = ['rgba', 'hex', 'hsla'];
     const newFormat = inputFormats[clickCount % inputFormats.length];
 
-    return Object.assign({}, state, {colorInputFormat: state.colorInputFormat.set(newFormat)});
+    return Object.assign(
+      {},
+      state,
+      {colorInputFormat: state.colorInputFormat.set(newFormat)}
+    );
   };
 }
 

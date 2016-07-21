@@ -4,47 +4,18 @@ import tinycolor from 'tinycolor2';
 
 import {either} from './helpers';
 
-import {
-  renderSaturationInput,
-  renderHueInput,
-  renderAlphaInput,
-  renderSwatch,
-  renderColorInput,
-  renderInputSwitcher
-} from './views';
-
+import view from './view';
 import makeReducer$ from './reducers';
 
 // TODO:
 // - Eat food (don't work on this while you're hungry)
-// - Fix indicators overshooting by 10px (transform translate in the CSS)
 // - Make scss more sensible
-// - ADD SOME CONSTANTS
 // - Test
 // - Make sure bundle works
 // - Publish to NPM
 //
 // TODO would be really nice but not entirely MVP:
 // - automatically switch to rgba input mode if alpha < 1
-
-function view (state) {
-  return (
-    div('.color-picker', [
-      renderSaturationInput(state),
-      div('.controls-container', [
-        renderSwatch(state),
-        div('.sliders', [
-          renderHueInput(state),
-          renderAlphaInput(state)
-        ])
-      ]),
-      div('.inputs-container', [
-        renderColorInput(state),
-        renderInputSwitcher(state)
-      ])
-    ])
-  );
-}
 
 export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) {
   const initialState = {

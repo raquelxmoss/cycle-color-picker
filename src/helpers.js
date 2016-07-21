@@ -1,5 +1,4 @@
 export function containerBoundaries (state, event, type) {
-  // ReactColor uses clientWidth and clientHeight here. There's probably a reason for that, so if there's a bug, try changing this.
   const container = state[`${type}Container`];
 
   const containerWidth = container.width;
