@@ -65,3 +65,7 @@ export function getColorFromHSLA (state, channel, value) {
 
   return color;
 }
+
+export function isInt (n) {
+  return n % 1 === 0;
+}

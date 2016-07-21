@@ -47,9 +47,13 @@ function updateChannel (event, type, updateFunction) {
   };
 }
 
+function colorInputShouldChange (state, input) {
+  return input === 'alpha' && state.colorInputFormat.value === 'hex';
+}
+
 function setActiveInputs (name) {
   return function _setActiveInputs (state) {
-    const colorInputFormat = name === 'alpha' ? 'rgba' : state.colorInputFormat.value;
+    const colorInputFormat = colorInputShouldChange(state, name) ? 'rgba' : state.colorInputFormat.value;
 
     return Object.assign(
       {},
@@ -59,7 +63,7 @@ function setActiveInputs (name) {
         colorInputFormat: state.colorInputFormat.set(colorInputFormat)
       }
     );
-  }
+  };
 }
 
 function makeInputElementReducer$ (name, DOM) {

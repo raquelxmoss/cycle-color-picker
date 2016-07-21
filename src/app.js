@@ -9,13 +9,10 @@ import makeReducer$ from './reducers';
 
 // TODO:
 // - Eat food (don't work on this while you're hungry)
-// - Make scss more sensible
+// - Make the CSS architecture better)
 // - Test
 // - Make sure bundle works
 // - Publish to NPM
-//
-// TODO would be really nice but not entirely MVP:
-// - automatically switch to rgba input mode if alpha < 1
 
 export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) {
   const initialState = {

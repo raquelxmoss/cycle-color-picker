@@ -2,6 +2,8 @@ import tinycolor from 'tinycolor2';
 import _ from 'lodash';
 import {div, input, span, p} from '@cycle/dom';
 
+import {isInt} from './helpers';
+
 const colorInputViews = {
   hex: (color) => renderHexInputElement(color.toHexString()),
   rgba: (color) => renderColorInputElement(color.toRgb()),
@@ -9,12 +11,14 @@ const colorInputViews = {
 };
 
 function makeInputElement (inputType, color, channel) {
+  const value = isInt(color[channel]) ? color[channel] : color[channel].toFixed(2);
+
   return (
     input(
       `.${inputType}-input .color-input`,
       {
         attributes: {
-          value: color[channel],
+          value,
           'data-channel': channel
         }
       }
