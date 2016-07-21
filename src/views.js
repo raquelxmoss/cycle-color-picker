@@ -64,9 +64,8 @@ export function renderSaturationInput (state) {
   const saturationIndicatorColor = state.color.v < 0.5 ? '#fff' : '#000';
 
   const saturationIndicatorStyle = {
-    // TODO - calculate offset for centering
-    left: `${state.saturationContainer.width * state.color.s - 6}px`,
-    top: `${state.saturationContainer.height * (1 - state.color.v) - 5}px`,
+    left: `${state.saturationContainer.width * state.color.s}px`,
+    top: `${state.saturationContainer.height * (1 - state.color.v)}px`,
     'border-color': saturationIndicatorColor
   };
 
@@ -82,7 +81,7 @@ export function renderSaturationInput (state) {
 
 export function renderHueInput (state) {
   const hueIndicatorStyle = {
-    left: `${state.hueContainer.width * state.color.h - 5}px`
+    left: `${state.hueContainer.width * state.color.h}px`
   };
 
   return (
@@ -96,7 +95,7 @@ export function renderHueInput (state) {
 
 export function renderAlphaInput (state) {
   const alphaIndicatorStyle = {
-    left: `${state.alphaContainer.width * state.color.a - 5}px`
+    left: `${state.alphaContainer.width * state.color.a}px`
   };
 
   const color = tinycolor.fromRatio(state.color);
