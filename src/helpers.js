@@ -1,3 +1,5 @@
+import tinycolor from 'tinycolor2';
+
 export function containerBoundaries (state, event, type) {
   const container = state[`${type}Container`];
 
@@ -42,4 +44,24 @@ export function either (values, currentValue) {
     is: (value) => value === currentValue,
     value: currentValue
   };
+}
+
+export function getColorFromHex (hex) {
+  const color = tinycolor(hex).toHsv();
+
+  return color;
+}
+
+export function getColorFromRGBA (state, channel, value) {
+  const color = tinycolor.fromRatio(state.color).toRgb();
+  color[channel] = value;
+
+  return color;
+}
+
+export function getColorFromHSLA (state, channel, value) {
+  const color = tinycolor.fromRatio(state.color).toHsl();
+  color[channel] = value;
+
+  return color;
 }

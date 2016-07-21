@@ -1,6 +1,13 @@
 import {Observable} from 'rx';
-import {between, containerBoundaries} from './helpers';
 import tinycolor from 'tinycolor2';
+
+import {
+  between,
+  containerBoundaries,
+  getColorFromHex,
+  getColorFromRGBA,
+  getColorFromHSLA
+} from './helpers';
 
 const update = {
   alpha: (event) => updateChannel(event, 'alpha', (x) => ({a: x})),
@@ -40,6 +47,21 @@ function updateChannel (event, type, updateFunction) {
   };
 }
 
+function setActiveInputs (name) {
+  return function _setActiveInputs (state) {
+    const colorInputFormat = name === 'alpha' ? 'rgba' : state.colorInputFormat.value;
+
+    return Object.assign(
+      {},
+      state,
+      {
+        activeInput: state.activeInput.set(name),
+        colorInputFormat: state.colorInputFormat.set(colorInputFormat)
+      }
+    );
+  }
+}
+
 function makeInputElementReducer$ (name, DOM) {
   const container = DOM
     .select(`.${name}`);
@@ -54,7 +76,7 @@ function makeInputElementReducer$ (name, DOM) {
     mouseDown$,
     click$
   )
-  .map(ev => state => Object.assign({}, state, {activeInput: state.activeInput.set(name)}));
+  .map(_ => setActiveInputs(name));
 
   const deactivateInput$ = click$
     .delay(200)
@@ -106,26 +128,6 @@ function setStateFromProps (props) {
       ...props
     };
   };
-}
-
-function getColorFromHex (hex) {
-  const color = tinycolor(hex).toHsv();
-
-  return color;
-}
-
-function getColorFromRGBA (state, channel, value) {
-  const color = tinycolor.fromRatio(state.color).toRgb();
-  color[channel] = value;
-
-  return color;
-}
-
-function getColorFromHSLA (state, channel, value) {
-  const color = tinycolor.fromRatio(state.color).toHsl();
-  color[channel] = value;
-
-  return color;
 }
 
 function setStateFromInput ({channel, value}) {
