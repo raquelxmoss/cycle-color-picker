@@ -19,15 +19,10 @@ import makeReducer$ from './reducers';
 // - Eat food (don't work on this while you're hungry)
 // - Fix indicators overshooting by 10px (transform translate in the CSS)
 // - Make scss more sensible
-// - DRY up how the inputs work
 // - ADD SOME CONSTANTS
-// - HSLA/RGBA display -- format to 2 decimal places
 // - Test
 // - Make sure bundle works
 // - Publish to NPM
-//
-// TODO refactors:
-// - Tidy up inputs and switcher stuff, it's quite naive at the moment, it could be abstracted more
 //
 // TODO would be really nice but not entirely MVP:
 // - automatically switch to rgba input mode if alpha < 1

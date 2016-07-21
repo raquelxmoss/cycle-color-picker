@@ -2,6 +2,18 @@ import {Observable} from 'rx';
 import {between, containerBoundaries} from './helpers';
 import tinycolor from 'tinycolor2';
 
+const update = {
+  alpha: (event) => updateChannel(event, 'alpha', (x) => ({a: x})),
+  hue: (event) => updateChannel(event, 'hue', (x) => ({h: x})),
+  saturation: (event) => updateChannel(event, 'saturation', (x, y) => ({s: x, v: 1 - y}))
+};
+
+const updateColorFromInput = {
+  hex: (state, channel, value) => getColorFromHex(value),
+  rgba: (state, channel, value) => getColorFromRGBA(state, channel, value),
+  hsla: (state, channel, value) => getColorFromHSLA(state, channel, value)
+};
+
 function updateChannel (event, type, updateFunction) {
   return function _updateChannel (state) {
     if (!state.activeInput.is(type)) { return state; }
@@ -27,12 +39,6 @@ function updateChannel (event, type, updateFunction) {
     };
   };
 }
-
-const update = {
-  alpha: (event) => updateChannel(event, 'alpha', (x) => ({a: x})),
-  hue: (event) => updateChannel(event, 'hue', (x) => ({h: x})),
-  saturation: (event) => updateChannel(event, 'saturation', (x, y) => ({s: x, v: 1 - y}))
-};
 
 function makeInputElementReducer$ (name, DOM) {
   const container = DOM
@@ -78,6 +84,15 @@ function makeInputElementReducer$ (name, DOM) {
   );
 }
 
+function makeTextInputElementReducer$ (name, DOM) {
+  return DOM
+    .select(`.${name}-input`)
+    .events('input')
+    .debounce(300)
+    .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
+    .map(({channel, value}) => setStateFromInput({channel, value}));
+}
+
 function setStateFromProps (props) {
   return function _setStateFromProps (state) {
     if ('color' in props) {
@@ -92,12 +107,6 @@ function setStateFromProps (props) {
     };
   };
 }
-
-const updateColorFromInput = {
-  hex: (state, channel, value) => getColorFromHex(value),
-  rgba: (state, channel, value) => getColorFromRGBA(state, channel, value),
-  hsla: (state, channel, value) => getColorFromHSLA(state, channel, value)
-};
 
 function getColorFromHex (hex) {
   const color = tinycolor(hex).toHsv();
@@ -159,20 +168,6 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
     .filter(ev => tinycolor(ev.target.value).isValid())
     .map(ev => setStateFromInput({value: ev.target.value}));
 
-  const setStateFromRGBAInput$ = DOM
-    .select('.rgba-input')
-    .events('input')
-    .debounce(300)
-    .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
-    .map(({channel, value}) => setStateFromInput({channel, value}));
-
-  const setStateFromHSLAInput$ = DOM
-    .select('.hsla-input')
-    .events('input')
-    .debounce(300)
-    .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
-    .map(({channel, value}) => setStateFromInput({channel, value}));
-
   const inputSwitcher$ = DOM
     .select('.switcher')
     .events('click')
@@ -188,14 +183,14 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
   return Observable.merge(
     setStateFromProps$,
     setStateFromHexInput$,
-    setStateFromRGBAInput$,
-    setStateFromHSLAInput$,
     changeColorInputFormat$,
 
     mouseUp$,
 
     makeInputElementReducer$('saturation', DOM),
     makeInputElementReducer$('hue', DOM),
-    makeInputElementReducer$('alpha', DOM)
+    makeInputElementReducer$('alpha', DOM),
+    makeTextInputElementReducer$('hsla', DOM),
+    makeTextInputElementReducer$('rgba', DOM)
   );
 }
