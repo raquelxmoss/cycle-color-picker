@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "babel-node server.js",
-    "test": "mocha --compilers js:babel-register",
+    "test": "mocha --compilers js:babel-core/register",
+    "autotest": "mocha --compilers js:babel-core/register --watch -R min",
     "bundle": "browserify index.js -t babelify -t uglifyify -o bundle.js"
   },
   "repository": {
@@ -37,6 +38,7 @@
     "@cycle/core": "^6.0.0-rc2",
     "@cycle/dom": "^9.0.1",
     "@cycle/isolate": "^1.2.0",
+    "@cycle/rx-adapter": "^3.0.0",
     "babel-cli": "^6.2.0",
     "babel-core": "^6.2.1",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
@@ -46,6 +48,7 @@
     "browserify-hmr": "^0.3.1",
     "budo": "^6.1.0",
     "cycle-restart": "0.0.14",
+    "mocha": "^2.5.3",
     "node-sass-middleware": "^0.9.8",
     "uglifyify": "^3.0.1"
   }
