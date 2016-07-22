@@ -1,15 +1,23 @@
+@import 'mixins';
 @import 'swatch';
 @import 'color-input';
 @import 'sliders';
 @import 'switcher';
 @import 'saturation';
 
+
+.left,
+.right {
+  @include flex-center;
+  flex-basis: 50%;
+  height: 100%;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
-  background: rgba(204, 204, 204, 0.1);
   font-family: Open sans, sans-serif;
 }
 
@@ -21,26 +29,19 @@ html, body {
   height: 100%;
 
   .app-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    @include flex-center;
     height: 100%;
   }
 }
 
 .controls-container {
-  padding: 10px 15px;;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flex-center;
+  padding: 10px 15px;
   height: 40px;
 }
 
 .inputs-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flex-center;
   padding: 0 15px 10px;
   text-transform: uppercase;
   color: #888;
@@ -58,6 +59,7 @@ html, body {
 
 .color-picker {
   width: 225px;
+  height: 250px;
   background: #eee;
   border-radius: 2px;
   box-shadow: rgba(0, 0, 0, 0.298039) 0px 0px 2px, rgba(0, 0, 0, 0.298039) 0px 4px 8px;

@@ -6,19 +6,17 @@
     display: flex;
 
     .channel-container {
-      display: flex;
+      @include flex-center;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
     }
 
     .color-input {
+      margin-bottom: 2px;
+      padding: 2px;
       width: 70%;
       height: 20px;
-      text-align: center;
       border: none;
-      padding: 2px;
-      margin-bottom: 2px;
+      text-align: center;
     }
   }
 }

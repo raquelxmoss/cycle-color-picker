@@ -8,33 +8,20 @@
   border-top-right-radius: 2px;
 
   .color-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    @include absolute-zero;
     background: linear-gradient(to right, #FFF, rgba(255, 255, 255, 0));
     z-index: 2;
   }
 
   .black {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    @include absolute-zero;
     background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
     z-index: 3;
   }
 
   .color {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    @include absolute-zero;
     z-index: 1;
-    background: #FF00E0;
   }
 
   .indicator {

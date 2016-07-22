@@ -154,10 +154,13 @@ function setStateFromInput ({channel, value}) {
   };
 }
 
-function changeColorInputFormat (clickCount) {
+function changeColorInputFormat () {
   return function _changeColorInputFormat (state) {
     const inputFormats = ['rgba', 'hex', 'hsla'];
-    const newFormat = inputFormats[clickCount % inputFormats.length];
+    const currentInput = inputFormats.indexOf(state.colorInputFormat.value);
+    const newInput = ((currentInput + 1) % inputFormats.length + inputFormats.length) % inputFormats.length;
+
+    const newFormat = inputFormats[newInput];
 
     return Object.assign(
       {},
@@ -181,10 +184,6 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
   const inputSwitcher$ = DOM
     .select('.switcher')
     .events('click')
-    .map(ev => +1)
-    .scan((total, curr) => total + curr);
-
-  const changeColorInputFormat$ = inputSwitcher$
     .map(changeColorInputFormat);
 
   const setStateFromProps$ = props$
@@ -193,7 +192,7 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
   return Observable.merge(
     setStateFromProps$,
     setStateFromHexInput$,
-    changeColorInputFormat$,
+    inputSwitcher$,
 
     mouseUp$,
 
