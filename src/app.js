@@ -3,7 +3,6 @@ import {Observable} from 'rx';
 import tinycolor from 'tinycolor2';
 
 import {either} from './helpers';
-
 import view from './view';
 import makeReducer$ from './reducers';
 

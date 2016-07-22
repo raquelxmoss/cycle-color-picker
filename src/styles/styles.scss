@@ -4,7 +4,24 @@
 @import 'sliders';
 @import 'switcher';
 @import 'saturation';
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
+.pickers {
+  display: flex;
+  flex: 1;
+  width: 100%;
+}
+
+.intro {
+  position: absolute;
+  width: 100%;
+  padding: 3em 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: #000 4px 4px 15px;
+}
 
 .left,
 .right {
@@ -18,7 +35,7 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
-  font-family: Open sans, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .container {
@@ -30,6 +47,7 @@ html, body {
 
   .app-container {
     @include flex-center;
+    flex-direction: column;
     height: 100%;
   }
 }
