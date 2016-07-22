@@ -1,0 +1,15 @@
+.controls-container {
+  @include flex-center;
+  padding: 10px 15px;
+  height: 40px;
+}
+
+.color-picker {
+  width: 225px;
+  height: 250px;
+  background: #eee;
+  border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.298039) 0px 0px 2px, rgba(0, 0, 0, 0.298039) 0px 4px 8px;
+  font-family: Helvetica, sans-serif;
+}
+

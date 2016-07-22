@@ -4,6 +4,8 @@
 @import 'sliders';
 @import 'switcher';
 @import 'saturation';
+@import 'color-picker';
+
 @import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
 .pickers {
@@ -52,36 +54,7 @@ html, body {
   }
 }
 
-.controls-container {
-  @include flex-center;
-  padding: 10px 15px;
-  height: 40px;
-}
 
-.inputs-container {
-  @include flex-center;
-  padding: 0 15px 10px;
-  text-transform: uppercase;
-  color: #888;
-  font-size: 0.7em;
-
-  .hex-input {
-    width: 100%;
-    margin: 0px 20px;
-    border: none;
-    padding: 8px;
-    text-align: center;
-    text-transform: uppercase;
-  }
-}
-
-.color-picker {
-  width: 225px;
-  height: 250px;
-  background: #eee;
-  border-radius: 2px;
-  box-shadow: rgba(0, 0, 0, 0.298039) 0px 0px 2px, rgba(0, 0, 0, 0.298039) 0px 4px 8px;
-}
 
 
 
