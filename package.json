@@ -31,6 +31,7 @@
   },
   "homepage": "https://github.com/raquelxmoss/cycle-color-picker",
   "dependencies": {
+    "stylin": "^4.2.0",
     "tinycolor2": "^1.3.0",
     "xs-combine-obj": "^1.0.2",
     "xstream": "^5.3.1"

@@ -1,8 +1,10 @@
 import tinycolor from 'tinycolor2';
+import css from 'stylin';
 import _ from 'lodash';
 import {div, input, span, p} from '@cycle/dom';
 
 import {isInt} from './helpers';
+import {styles} from './styles/color-picker';
 
 const colorInputViews = {
   hex: (color) => renderHexInputElement(color.toHexString()),
@@ -57,8 +59,8 @@ function renderColorInputs (state) {
 function renderInputSwitcher (state) {
   return (
     div('.input-switcher', [
-      p('.switcher .switcher-up'),
-      p('.switcher .switcher-down')
+      p('.switcher .up'),
+      p('.switcher .down')
     ])
   );
 }
@@ -70,15 +72,15 @@ function renderSaturationInput (state) {
   const saturationIndicatorStyle = {
     left: `${state.saturationContainer.width * state.color.s}px`,
     top: `${state.saturationContainer.height * (1 - state.color.v)}px`,
-    'border-color': saturationIndicatorColor
+    'border': `1px solid ${saturationIndicatorColor} !important`
   };
 
   return (
     div('.saturation', [
-      div('.color-overlay'),
-      div('.color', {style: {background: saturationBackground}}),
-      div('.black'),
-      div('.indicator', {style: saturationIndicatorStyle})
+      div('.white-overlay'),
+      div('.saturation-color', {style: {background: saturationBackground}}),
+      div('.grey-overlay'),
+      div('.saturation-indicator', {style: saturationIndicatorStyle})
     ])
   );
 }
@@ -135,7 +137,7 @@ function renderSwatch (state) {
 
 export default function view (state) {
   return (
-    div('.color-picker', [
+    div(`.color-picker ${css(styles)}`, [
       renderSaturationInput(state),
       div('.controls-container', [
         renderSwatch(state),

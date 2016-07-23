@@ -1,11 +1,3 @@
-@import 'mixins';
-@import 'swatch';
-@import 'color-input';
-@import 'sliders';
-@import 'switcher';
-@import 'saturation';
-@import 'color-picker';
-
 @import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
 .pickers {
@@ -27,7 +19,9 @@
 
 .left,
 .right {
-  @include flex-center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-basis: 50%;
   height: 100%;
 }
@@ -48,7 +42,9 @@ html, body {
   height: 100%;
 
   .app-container {
-    @include flex-center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
     height: 100%;
   }
