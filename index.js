@@ -1,8 +1,8 @@
-import {run} from '@cycle/core';
+import {run} from '@cycle/xstream-run';
 import {div, h1, h2, makeDOMDriver} from '@cycle/dom';
-import {Observable} from 'rx';
+import xs from 'xstream';
 import isolate from '@cycle/isolate';
-import combineLatestObj from 'rx-combine-latest-obj';
+import combineObj from 'xs-combine-obj';
 
 import mouse from './src/drivers/mouse-driver';
 
@@ -21,23 +21,23 @@ function view ({colorPickerADOM, colorPickerBDOM, colorPickerAColor, colorPicker
         h2('.intro-text', 'A color picker component for Cycle.js')
       ]),
       div('.pickers', [
-        div('.left', {style: {background: colorPickerAColor}}, colorPickerADOM),
-        div('.right', {style: {background: colorPickerBColor}}, colorPickerBDOM)
+        div('.left', {style: {background: colorPickerAColor}}, [colorPickerADOM]),
+        div('.right', {style: {background: colorPickerBColor}}, [colorPickerBDOM])
       ])
     ])
   );
 }
 
 function app (sources) {
-  const propsA$ = Observable.of({color: '#C3209F'});
-  const propsB$ = Observable.of({color: '#542A93'});
+  const propsA$ = xs.of({color: '#C3209F'});
+  const propsB$ = xs.of({color: '#542A93'});
 
   const ColorPickerA = isolate(ColorPicker);
   const colorPickerA = ColorPickerA({...sources, props$: propsA$});
   const ColorPickerB = isolate(ColorPicker);
   const colorPickerB = ColorPickerB({...sources, props$: propsB$});
 
-  const state$ = combineLatestObj({
+  const state$ = combineObj({
     colorPickerADOM: colorPickerA.DOM,
     colorPickerBDOM: colorPickerB.DOM,
     colorPickerAColor: colorPickerA.color$,
@@ -49,4 +49,4 @@ function app (sources) {
   };
 }
 
-const {sinks, sources} = run(app, drivers);
+run(app, drivers);
