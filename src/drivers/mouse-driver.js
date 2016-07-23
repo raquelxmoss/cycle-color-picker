@@ -1,9 +1,9 @@
-import {Observable} from 'rx';
+import fromEvent from 'xstream/extra/fromEvent';
 
 export default function mouse () {
   return {
     up () {
-      return Observable.fromEvent(document, 'mouseup')
+      return fromEvent(document, 'mouseup');
     }
   };
 }

@@ -1,5 +1,5 @@
-import {div} from '@cycle/dom';
-import {Observable} from 'rx';
+import xs from 'xstream';
+import dropRepeats from 'xstream/extra/droprepeats';
 import tinycolor from 'tinycolor2';
 
 import {either} from './helpers';
@@ -13,7 +13,7 @@ import makeReducer$ from './reducers';
 // - Make sure bundle works
 // - Publish to NPM
 
-export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) {
+export default function ColorPicker ({DOM, Mouse, props$ = xs.empty()}) {
   const initialState = {
     activeInput: either(['none', 'hue', 'saturation', 'alpha'], 'none'),
 
@@ -28,16 +28,14 @@ export default function ColorPicker ({DOM, Mouse, props$ = Observable.empty()}) 
   const action$ = makeReducer$({DOM, Mouse, props$});
 
   const state$ = action$
-    .startWith(initialState)
-    .scan((state, action) => action(state))
-    .shareReplay(1)
-    .distinctUntilChanged(JSON.stringify);
+    .fold((state, action) => action(state), initialState)
+    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b))) // TODO do this better
+    .remember();
 
   const color$ = state$
     .map(state => {
       return tinycolor.fromRatio(state.color).toRgbString();
-    })
-    .distinctUntilChanged();
+    });
 
   return {
     DOM: state$.map(view),

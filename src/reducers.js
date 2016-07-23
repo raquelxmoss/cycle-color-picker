@@ -1,6 +1,9 @@
-import {Observable} from 'rx';
+import xs from 'xstream';
+import debounce from 'xstream/extra/debounce';
+import delay from 'xstream/extra/delay';
 import tinycolor from 'tinycolor2';
 
+import {sample} from './operators';
 import {
   between,
   containerBoundaries,
@@ -76,33 +79,33 @@ function makeInputElementReducer$ (name, DOM) {
   const mouseDown$ = container
     .events('mousedown');
 
-  const activeInput$ = Observable.merge(
+  const activeInput$ = xs.merge(
     mouseDown$,
     click$
   )
   .map(_ => setActiveInputs(name));
 
   const deactivateInput$ = click$
-    .delay(200)
+    .compose(delay(200))
     .map(ev => state => Object.assign({}, state, {activeInput: state.activeInput.set('none')}));
 
   const mouseMove$ = container
     .events('mousemove');
 
-  const update$ = Observable.merge(
+  const update$ = xs.merge(
     mouseMove$,
     click$
   )
   .map(ev => update[name](ev));
 
   const container$ = container
-    .observable
-    .skip(1)
+    .elements()
+    .drop(1)
     .map(el => el[0].getBoundingClientRect())
     .map(value => state => ({...state, [`${name}Container`]: value}))
-    .sample(100);
+    .compose(sample(100));
 
-  return Observable.merge(
+  return xs.merge(
     activeInput$,
     deactivateInput$,
     update$,
@@ -114,7 +117,7 @@ function makeTextInputElementReducer$ (name, DOM) {
   return DOM
     .select(`.${name}-input`)
     .events('input')
-    .debounce(300)
+    .compose(debounce(300))
     .map(ev => ({value: ev.target.value, channel: ev.target.getAttribute('data-channel')}))
     .map(({channel, value}) => setStateFromInput({channel, value}));
 }
@@ -177,7 +180,7 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
   const setStateFromHexInput$ = DOM
     .select('.hex-input')
     .events('input')
-    .debounce(300)
+    .compose(debounce(300))
     .filter(ev => tinycolor(ev.target.value).isValid())
     .map(ev => setStateFromInput({value: ev.target.value}));
 
@@ -189,7 +192,7 @@ export default function makeReducer$ ({DOM, Mouse, props$}) {
   const setStateFromProps$ = props$
     .map(setStateFromProps);
 
-  return Observable.merge(
+  return xs.merge(
     setStateFromProps$,
     setStateFromHexInput$,
     inputSwitcher$,

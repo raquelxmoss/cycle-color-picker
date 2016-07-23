@@ -17,7 +17,7 @@ function makeInputElement (inputType, color, channel) {
     input(
       `.${inputType}-input .color-input`,
       {
-        attributes: {
+        props: {
           value,
           'data-channel': channel
         }
@@ -42,7 +42,7 @@ function renderColorInputElement (color) {
 }
 
 function renderHexInputElement (color) {
-  return input('.hex-input', {type: 'text', value: color});
+  return input('.hex-input', {props: {type: 'text', value: color}});
 }
 
 function renderColorInputs (state) {
