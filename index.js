@@ -1,16 +1,15 @@
 import {run} from '@cycle/xstream-run';
 import {div, h1, h2, makeDOMDriver} from '@cycle/dom';
+import {makeMouseDriver} from 'cycle-mouse-driver';
 import xs from 'xstream';
 import isolate from '@cycle/isolate';
 import combineObj from 'xs-combine-obj';
-
-import mouse from './src/drivers/mouse-driver';
 
 var ColorPicker = require('./src/app').default;
 
 const drivers = {
   DOM: makeDOMDriver('.app'),
-  Mouse: mouse
+  Mouse: makeMouseDriver()
 };
 
 function view ({colorPickerADOM, colorPickerBDOM, colorPickerAColor, colorPickerBColor}) {
