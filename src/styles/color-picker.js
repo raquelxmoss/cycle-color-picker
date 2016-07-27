@@ -6,11 +6,6 @@ import {
   inputsContainer,
   hexInput,
   controlsContainer,
-  saturation,
-  whiteOverlay,
-  greyOverlay,
-  saturationColor,
-  saturationIndicator,
   sliders,
   hueContainer,
   alphaContainer,
@@ -20,6 +15,8 @@ import {
   swatchStyle,
   switcherStyle
 } from '../styles';
+
+import {saturation} from './saturation';
 
 export const styles = {
   'width': '255px',
@@ -36,10 +33,6 @@ export const styles = {
   '.hex-input': hexInput,
   '.controls-container': controlsContainer,
   '.saturation': saturation,
-  '.white-overlay': whiteOverlay,
-  '.grey-overlay': greyOverlay,
-  '.saturation-color': saturationColor,
-  '.saturation-indicator': saturationIndicator,
   '.sliders': sliders,
   '.hue-container': hueContainer,
   '.alpha-container': alphaContainer,
