@@ -2,12 +2,18 @@
   "name": "cycle-color-picker",
   "version": "0.1.0",
   "description": "A color picker component for Cycle.js",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "files": [
+    "lib/"
+  ],
   "scripts": {
     "start": "babel-node server.js",
     "test": "mocha --compilers js:babel-core/register",
     "autotest": "mocha --compilers js:babel-core/register --watch -R min",
-    "bundle": "browserify index.js -t babelify -t uglifyify -o bundle.js"
+    "bundle": "browserify index.js -t babelify -t uglifyify -o bundle.js",
+    "precompile-lib": "rm -rf lib/ && mkdir -p lib",
+    "compile-lib": "babel src -d lib",
+    "prepublish": "npm run compile-lib"
   },
   "repository": {
     "type": "git",
