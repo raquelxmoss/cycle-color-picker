@@ -44,15 +44,11 @@ export const inputs = {
     '.up': {
       'height': '20px',
       'width': '20px',
-      'background': 'url("/src/icons/arrow-up.svg")',
-      'background-size': '20px',
       'margin': '0'
     },
     '.down': {
       'height': '20px',
       'width': '20px',
-      'background': 'url("/src/icons/arrow-down.svg")',
-      'background-size': '20px',
       'margin': '0'
     }
   }

@@ -1,10 +1,13 @@
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
 import _ from 'lodash';
+import fs from 'fs';
 import {div, input, span, p} from '@cycle/dom';
 
 import {isInt} from './helpers';
 import {styles} from './styles/color-picker';
+import downArrow from './icons/arrow-down.svg';
+import upArrow from './icons/arrow-up.svg';
 
 const colorInputViews = {
   hex: (color) => renderHexInputElement(color.toHexString()),
@@ -59,8 +62,8 @@ function renderColorInputs (state) {
 function renderInputSwitcher (state) {
   return (
     div('.input-switcher', [
-      p('.switcher .up'),
-      p('.switcher .down')
+      p('.switcher .up', [upArrow]),
+      p('.switcher .down', [downArrow])
     ])
   );
 }
