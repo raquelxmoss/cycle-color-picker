@@ -1,6 +1,6 @@
 {
   "name": "cycle-color-picker",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A color picker component for Cycle.js",
   "main": "index.js",
   "scripts": {
@@ -34,10 +34,10 @@
     "stylin": "^4.2.0",
     "cycle-mouse-driver": "0.0.1",
     "tinycolor2": "^1.3.0",
-    "xs-combine-obj": "^1.0.2",
     "xstream": "^5.3.1"
   },
   "devDependencies": {
+    "xs-combine-obj": "^1.0.2",
     "@cycle/dom": "^11.0.1",
     "@cycle/isolate": "^1.2.0",
     "@cycle/xstream-adapter": "^3.0.2",
