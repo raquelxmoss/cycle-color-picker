@@ -8,8 +8,6 @@ import makeReducer$ from './reducers';
 
 // TODO:
 // - Eat food (don't work on this while you're hungry)
-// - Make the CSS architecture better)
-// - Test
 // - Make sure bundle works
 // - Publish to NPM
 
