@@ -4,8 +4,7 @@ import {makeMouseDriver} from 'cycle-mouse-driver';
 import xs from 'xstream';
 import isolate from '@cycle/isolate';
 import combineObj from 'xs-combine-obj';
-
-var ColorPicker = require('./src/app').default;
+import ColorPicker from './src/color-picker';
 
 const drivers = {
   DOM: makeDOMDriver('.app'),
