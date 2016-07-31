@@ -1,5 +1,5 @@
 /* globals describe, it */
-import ColorPicker from '../src/app';
+import ColorPicker from '../src/color-picker';
 
 import assert from 'assert';
 import xs from 'xstream';
