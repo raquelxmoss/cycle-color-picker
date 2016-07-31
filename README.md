@@ -101,15 +101,6 @@ Yes! Cycle Color Picker can be used with Cycle's `isolate()`. [Read the document
 
 Cycle Color Picker needs to listen for mouseup events on the entire document, rather than just within the Color Picker component. As such, we need to use a driver. Unfortunately there's no nice way (yet) to seamlessly include a driver that is a dependency of a component, so you need to do a bit of manual work yourself, passing the Mouse and DOM drivers into the Color Picker component.
 
-### What if I'm already using another mouse driver?
-
-Yeah… sorry about that. There's two options here:
-
-1. If `Cycle Mouse Driver` fulfills your needs, you could remove your existing mouse driver, and use `Cycle Mouse Driver`
-2. You could rename your existing mouse driver in your sinks and sources (e.g. to `MouseDriver` rather than `Mouse`) and use it along with `Cycle Mouse Driver`
-
-Neither option is ideal, really. I'm hoping to find a way to deal with injecting drivers in a less disruptive way.
-
 ### Can I use this with RxJs?
 
 Not yet! I'm hoping to work towards stream library diversity soon.
