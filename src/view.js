@@ -72,7 +72,7 @@ function renderSaturationInput (state) {
   const saturationIndicatorStyle = {
     left: `${state.saturationContainer.width * state.color.s}px`,
     top: `${state.saturationContainer.height * (1 - state.color.v)}px`,
-    'border': `1px solid ${saturationIndicatorColor} !important`
+    'border-color': `${saturationIndicatorColor}`
   };
 
   return (
@@ -137,7 +137,7 @@ function renderSwatch (state) {
 
 export default function view (state) {
   return (
-    div(`.color-picker ${css(styles)}`, [
+    div(`.color-picker ${css.unimportant(styles)}`, [
       renderSaturationInput(state),
       div('.controls-container', [
         renderSwatch(state),
