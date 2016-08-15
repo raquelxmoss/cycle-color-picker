@@ -11,7 +11,7 @@ import makeReducer$ from './reducers';
 // - Make sure bundle works
 // - Publish to NPM
 
-export default function ColorPicker ({DOM, Mouse, props$ = xs.empty()}) {
+export default function ColorPicker ({DOM, props$ = xs.empty()}) {
   const initialState = {
     activeInput: either(['none', 'hue', 'saturation', 'alpha'], 'none'),
 
@@ -23,7 +23,7 @@ export default function ColorPicker ({DOM, Mouse, props$ = xs.empty()}) {
     colorInputFormat: either(['hex', 'rgba', 'hsla'], 'hex')
   };
 
-  const action$ = makeReducer$({DOM, Mouse, props$});
+  const action$ = makeReducer$({DOM, props$});
 
   const state$ = action$
     .fold((state, action) => action(state), initialState)

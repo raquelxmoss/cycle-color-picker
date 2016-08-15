@@ -1,6 +1,6 @@
 {
   "name": "cycle-color-picker",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A color picker component for Cycle.js",
   "main": "lib/color-picker.js",
   "files": [
@@ -37,13 +37,12 @@
   },
   "homepage": "https://github.com/raquelxmoss/cycle-color-picker",
   "dependencies": {
+    "@cycle/dom": "^12.1.0",
     "stylin": "^4.2.0",
-    "cycle-mouse-driver": "0.0.1",
     "tinycolor2": "^1.3.0",
     "xstream": "^5.3.1"
   },
   "devDependencies": {
-    "@cycle/dom": "^11.0.1",
     "@cycle/isolate": "^1.2.0",
     "@cycle/xstream-adapter": "^3.0.2",
     "@cycle/xstream-run": "^3.0.3",
@@ -57,7 +56,6 @@
     "browserify-hmr": "^0.3.1",
     "budo": "^6.1.0",
     "mocha": "^2.5.3",
-    "node-sass-middleware": "^0.9.8",
     "uglifyify": "^3.0.1",
     "xs-combine-obj": "^1.0.2"
   }

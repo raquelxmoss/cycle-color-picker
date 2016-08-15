@@ -173,8 +173,10 @@ function changeColorInputFormat () {
   };
 }
 
-export default function makeReducer$ ({DOM, Mouse, props$}) {
-  const mouseUp$ = Mouse.up()
+export default function makeReducer$ ({DOM, props$}) {
+  const mouseUp$ = DOM
+    .select('document')
+    .events('mouseup')
     .map(ev => state => ({...state, activeInput: state.activeInput.set('none')}));
 
   const setStateFromHexInput$ = DOM
