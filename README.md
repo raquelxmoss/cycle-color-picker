@@ -4,53 +4,32 @@ A color picker component for Cycle.js. Cycle Color Picker is developed for usage
 
 # Installation
 
-Cycle Color Picker depends on [Cycle Mouse Driver](https://github.com/cyclejs-community/cycle-mouse-driver). You'll need to install and save both.
-
 ```bash
-$ npm install --save cycle-color-picker cycle-mouse-driver
+$ npm install --save cycle-color-picker
 
 ```
 
 # Usage
 
-Import Cycle Color Picker and Cycle Mouse Driver into your project. Cycle Color Picker takes in a stream of colors, and returns a stream of colors based on the user's input.
+Import Cycle Color Picker into your project. Cycle Color Picker takes in a stream of colors, and returns a stream of colors based on the user's input.
 
 [Check out the example](http://raquelxmoss.github.io/cycle-color-picker)
 
 ```js
 // index.js
-
-import {makeMouseDriver} from 'cycle-mouse-driver';
 import ColorPicker from 'cycle-color-picker';
-```
-
-Add Cycle Mouse Driver to your drivers Object, so that it is available to the Color Picker component.
-
-```js
-// index.js
-
-const drivers = {
-  Mouse: makeMouseDriver()
-}
-
-function main ({DOM, Mouse}) {
-  // your main function
-}
-
-run(main, drivers);
 ```
 
 Create a Color Picker component, passing it a stream of colors, as well as the DOM driver and Mouse driver.
 
-You can pass colors to Cycle Color Picker as `hex`,` rgb(a)`, `hsl(a)`, or named color (e.g. `aliceblue`). If no color is passed to Cycle Color Picker, the initial color will default to white.
+You can pass colors to Cycle Color Picker as `hex`,` rgb(a)`, `hsl(a)`, or a named color (e.g. `aliceblue`). If no color is passed to Cycle Color Picker, the initial color will default to white. You'll also need to pass in a DOM driver.
 
 ```js
 const props$ = xs.of({color: '#C3209f'});
-
-const colorPicker = ColorPicker({DOM, Mouse, props$});
+const colorPicker = ColorPicker({DOM, props$});
 ```
 
-Cycle Color Picker returns `DOM`, and `color$`, which you can access in your app. To display Cycle Color Picker in your app, pass its DOM into your view function.
+Cycle Color Picker returns `DOM`, and `color$`, which you can access in your app. To display Cycle Color Picker, pass its DOM into your view function.
 
 Here's a simple example of a Color Picker that changes the background color of the app. To see how to use Cycle Color Picker with Cycle's isolate function, [check out the example](http://raquelxmoss.github.io/cycle-color-picker').
 
@@ -58,12 +37,10 @@ Here's a simple example of a Color Picker that changes the background color of t
 import xs from 'xstream';
 import {run} from '@cycle/xstream-run';
 import {div, makeDOMDriver} from '@cycle/dom';
-import {makeMouseDriver} from 'cycle-mouse-driver';
 import ColorPicker from 'cycle-color-picker';
 
 const drivers = {
   DOM: makeDOMDriver('.app'),
-  Mouse: makeMouseDriver()
 };
 
 function view (state) {
@@ -74,9 +51,9 @@ function view (state) {
   );
 }
 
-function main ({DOM, Mouse}) {
+function main ({DOM}) {
   const props$ = xs.of({color: '#C3209F'});
-  const colorPicker = ColorPicker({DOM, Mouse, props$});
+  const colorPicker = ColorPicker({DOM, props$});
 
   const state$ = xs.combine(
     colorPicker.DOM,
@@ -96,10 +73,6 @@ run(main, drivers);
 ### Can I use multiple color pickers within my app?
 
 Yes! Cycle Color Picker can be used with Cycle's `isolate()`. [Read the documentation for `isolate()`](https://github.com/cyclejs/cyclejs/tree/master/isolate), and check out the [example](http://raquelxmoss.github.io/cycle-color-picker).
-
-### Why do I need to install a mouse driver too?
-
-Cycle Color Picker needs to listen for mouseup events on the entire document, rather than just within the Color Picker component. As such, we need to use a driver. Unfortunately there's no nice way (yet) to seamlessly include a driver that is a dependency of a component, so you need to do a bit of manual work yourself, passing the Mouse and DOM drivers into the Color Picker component.
 
 ### Can I use this with RxJs?
 
