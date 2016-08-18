@@ -2,6 +2,8 @@
 
 A color picker component for Cycle.js. Cycle Color Picker is developed for usage within [Cycle](http://cycle.js.org/) applications using [xstream](https://github.com/staltz/xstream).
 
+![Color Picker in Action](./color-picker-in-action.gif)
+
 # Installation
 
 ```bash
