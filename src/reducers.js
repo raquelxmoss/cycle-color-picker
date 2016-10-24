@@ -1,9 +1,9 @@
 import xs from 'xstream';
 import debounce from 'xstream/extra/debounce';
 import delay from 'xstream/extra/delay';
+import throttle from 'xstream/extra/throttle';
 import tinycolor from 'tinycolor2';
 
-import {sample} from './operators';
 import {
   between,
   containerBoundaries,
@@ -103,7 +103,7 @@ function makeInputElementReducer$ (name, DOM) {
     .drop(1)
     .map(el => el[0].getBoundingClientRect())
     .map(value => state => ({...state, [`${name}Container`]: value}))
-    .compose(sample(100));
+    .compose(throttle(60));
 
   return xs.merge(
     activeInput$,
