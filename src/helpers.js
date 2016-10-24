@@ -8,8 +8,9 @@ export function containerBoundaries (state, event, type) {
   const containerLeft = container.left;
   const containerTop = container.top;
 
-  const left = event.pageX - containerLeft;
-  const top = event.pageY - containerTop;
+  // TODO: don't use window here Raquel you dork
+  const left = event.pageX - (containerLeft + window.scrollX);
+  const top = event.pageY - (containerTop + window.scrollY);
 
   return {
     containerWidth,
