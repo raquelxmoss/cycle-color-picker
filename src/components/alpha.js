@@ -7,6 +7,15 @@ import tinycolor from 'tinycolor2';
 import { alphaStyle } from '../styles/alpha';
 import css from 'stylin';
 
+function sample (interval) {
+  return function sampleOperator (stream) {
+    const periodic$ = xs.periodic(interval);
+
+    return stream
+      .map(event => periodic$.mapTo(event))
+      .flatten();
+  };
+}
 // view
 function view ([state, props]) {
   const alphaIndicatorStyle = {
@@ -69,9 +78,9 @@ export default function Alpha ({DOM, props$}) {
   const containerEl$ = container$
     .elements()
     .drop(1)
+    .compose(sample(100))
     .map(el => el[0].getBoundingClientRect())
-    .map(value => setState('nil', 'container', value))
-    .compose(throttle(100));
+    .map(value => setState('nil', 'container', value));
 
   const mouseDown$ = container$
     .events('mousedown')
@@ -79,6 +88,11 @@ export default function Alpha ({DOM, props$}) {
 
   const mouseMove$ = container$
     .events('mousemove')
+
+  const click$ = container$
+    .events('click')
+
+  const update$ = xs.merge(click$, mouseMove$)
     .map(ev => updateAlpha(ev));
 
   // TODO: Send actions
@@ -97,14 +111,14 @@ export default function Alpha ({DOM, props$}) {
   const action$ = xs.merge(
     containerEl$,
     mouseDown$,
-    mouseMove$,
-    mouseUp$
+    mouseUp$,
+    update$
   );
 
   const state$ = action$.fold((state, action) => action(state), initialState)
 
   return {
     DOM: xs.combine(state$, props$).map(view),
-    alpha$: state$.compose(dropRepeats())
+    alpha$: state$.compose(dropRepeats((state) => JSON.stringify(state) === JSON.stringify(state)))
   };
 }
