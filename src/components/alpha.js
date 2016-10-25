@@ -87,10 +87,10 @@ export default function Alpha ({DOM, props$}) {
     .map(ev => setState(ev, 'mouseIsDown', true));
 
   const mouseMove$ = container$
-    .events('mousemove')
+    .events('mousemove');
 
   const click$ = container$
-    .events('click')
+    .events('click');
 
   const update$ = xs.merge(click$, mouseMove$)
     .map(ev => updateAlpha(ev));
@@ -103,7 +103,7 @@ export default function Alpha ({DOM, props$}) {
     .map(ev => setState(event, 'mouseIsDown', false));
 
   const initialState = {
-    a: 1,
+    alpha: 1,
     mouseIsDown: false,
     container: { width: 0, height: 0 }
   };
