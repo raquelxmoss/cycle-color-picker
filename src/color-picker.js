@@ -6,11 +6,6 @@ import {either} from './helpers';
 import view from './view';
 import makeReducer$ from './reducers';
 
-// TODO:
-// - Eat food (don't work on this while you're hungry)
-// - Make sure bundle works
-// - Publish to NPM
-
 export default function ColorPicker ({DOM, props$ = xs.empty()}) {
   const initialState = {
     activeInput: either(['none', 'hue', 'saturation', 'alpha'], 'none'),
@@ -19,9 +14,13 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
     hueContainer: {width: 0},
     alphaContainer: {width: 0},
 
-    color: {h: 0, s: 0, v: 1, a: 1},
+    color: props$.take(1).map(props => props.color),
     colorInputFormat: either(['hex', 'rgba', 'hsla'], 'hex')
   };
+
+
+  // const saturation$ = SaturationLightness({DOM, props$ = xs.of(s, v)});
+  // const hue$ = Hue({DOM, props$ = xs.of(h)});
 
   const action$ = makeReducer$({DOM, props$});
 
@@ -29,6 +28,9 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
     .fold((state, action) => action(state), initialState)
     .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b))) // TODO do this better
     .remember();
+
+  const a$ = state$.map(state => state.color.a);
+  const alpha$ = Alpha({DOM, props$: xs.of(a$)});
 
   const color$ = state$
     .map(state => {

@@ -2,14 +2,13 @@ import {run} from '@cycle/xstream-run';
 import {div, h1, h2, makeDOMDriver} from '@cycle/dom';
 import xs from 'xstream';
 import isolate from '@cycle/isolate';
-import combineObj from 'xs-combine-obj';
-import ColorPicker from './src/color-picker';
+import Alpha from './src/components/alpha';
 
 const drivers = {
   DOM: makeDOMDriver('.app')
 };
 
-function view ({colorPickerADOM, colorPickerBDOM, colorPickerAColor, colorPickerBColor}) {
+function view (state) {
   return (
     div('.app-container', [
       div('.intro', [
@@ -17,28 +16,16 @@ function view ({colorPickerADOM, colorPickerBDOM, colorPickerAColor, colorPicker
         h2('.intro-text', 'A color picker component for Cycle.js')
       ]),
       div('.pickers', [
-        div('.left', {style: {background: colorPickerAColor}}, [colorPickerADOM]),
-        div('.right', {style: {background: colorPickerBColor}}, [colorPickerBDOM])
+        div('.left', [state])
       ])
     ])
   );
 }
 
 function app (sources) {
-  const propsA$ = xs.of({color: '#C3209F'});
-  const propsB$ = xs.of({color: '#542A93'});
-
-  const ColorPickerA = isolate(ColorPicker);
-  const colorPickerA = ColorPickerA({...sources, props$: propsA$});
-  const ColorPickerB = isolate(ColorPicker);
-  const colorPickerB = ColorPickerB({...sources, props$: propsB$});
-
-  const state$ = combineObj({
-    colorPickerADOM: colorPickerA.DOM,
-    colorPickerBDOM: colorPickerB.DOM,
-    colorPickerAColor: colorPickerA.color$,
-    colorPickerBColor: colorPickerB.color$
-  });
+  const props$ = xs.of({color: '#C3209F'});
+  const alpha = Alpha({...sources, props$});
+  const state$ = alpha.DOM;
 
   return {
     DOM: state$.map(view)

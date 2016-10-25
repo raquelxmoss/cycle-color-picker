@@ -79,11 +79,8 @@ function makeInputElementReducer$ (name, DOM) {
   const mouseDown$ = container
     .events('mousedown');
 
-  const activeInput$ = xs.merge(
-    mouseDown$,
-    click$
-  )
-  .map(_ => setActiveInputs(name));
+  const activeInput$ = xs.merge(mouseDown$, click$)
+    .map(_ => setActiveInputs(name));
 
   const deactivateInput$ = click$
     .compose(delay(200))
@@ -92,11 +89,8 @@ function makeInputElementReducer$ (name, DOM) {
   const mouseMove$ = container
     .events('mousemove');
 
-  const update$ = xs.merge(
-    mouseMove$,
-    click$
-  )
-  .map(ev => update[name](ev));
+  const update$ = xs.merge(mouseMove$, click$)
+    .map(ev => update[name](ev));
 
   const container$ = container
     .elements()
@@ -174,11 +168,14 @@ function changeColorInputFormat () {
 }
 
 export default function makeReducer$ ({DOM, props$}) {
+  // parent
+  //
   const mouseUp$ = DOM
     .select('document')
     .events('mouseup')
     .map(ev => state => ({...state, activeInput: state.activeInput.set('none')}));
 
+  //parent
   const setStateFromHexInput$ = DOM
     .select('.hex-input')
     .events('input')
@@ -186,6 +183,7 @@ export default function makeReducer$ ({DOM, props$}) {
     .filter(ev => tinycolor(ev.target.value).isValid())
     .map(ev => setStateFromInput({value: ev.target.value}));
 
+  // text input
   const inputSwitcher$ = DOM
     .select('.switcher')
     .events('click')
