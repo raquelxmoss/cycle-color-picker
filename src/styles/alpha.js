@@ -1,4 +1,4 @@
-export const alpha = {
+export const alphaStyle = {
   'height': '10px',
   'width': '100%',
   'cursor': 'pointer',

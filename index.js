@@ -24,8 +24,8 @@ function view (state) {
 
 function app (sources) {
   const props$ = xs.of({color: '#C3209F'});
-  const alpha = Alpha({...sources, props$});
-  const state$ = alpha.DOM;
+  const alpha$ = Alpha({...sources, props$});
+  const state$ = alpha$.DOM
 
   return {
     DOM: state$.map(view)

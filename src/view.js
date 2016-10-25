@@ -1,7 +1,6 @@
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
 import _ from 'lodash';
-import fs from 'fs';
 import {div, input, span, p} from '@cycle/dom';
 
 import {isInt} from './helpers';

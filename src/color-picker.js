@@ -9,11 +9,8 @@ import makeReducer$ from './reducers';
 export default function ColorPicker ({DOM, props$ = xs.empty()}) {
   const initialState = {
     activeInput: either(['none', 'hue', 'saturation', 'alpha'], 'none'),
-
     saturationContainer: {width: 0, height: 0},
     hueContainer: {width: 0},
-    alphaContainer: {width: 0},
-
     color: props$.take(1).map(props => props.color),
     colorInputFormat: either(['hex', 'rgba', 'hsla'], 'hex')
   };
@@ -29,7 +26,7 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
     .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b))) // TODO do this better
     .remember();
 
-  const a$ = state$.map(state => state.color.a);
+  const a$ = state$.map(state => state.color.a).take(1);
   const alpha$ = Alpha({DOM, props$: xs.of(a$)});
 
   const color$ = state$
