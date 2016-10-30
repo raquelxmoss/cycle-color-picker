@@ -7,8 +7,6 @@ import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
 import Alpha from './components/alpha';
 
-// import view from './view';
-
 function view ([state, saturationValue, hue, alpha]) {
   const swatch = div('.swatchy', {style: {
     width: '100px',

@@ -7,9 +7,9 @@ import tinycolor from 'tinycolor2';
 import { alphaStyle } from '../styles/alpha';
 import css from 'stylin';
 
-function view ([state, props]) {
+function view ([props, alpha, container]) {
   const alphaIndicatorStyle = {
-    left: `${state.container.width * state.alpha}px`
+    left: `${container.width * alpha}px`
   };
 
   const color = tinycolor.fromRatio(props.color);
@@ -29,36 +29,11 @@ function view ([state, props]) {
   );
 }
 
-function updateAlpha (event) {
-  return function _updateAlpha (state) {
-    if (!state.mouseIsDown) { return state; }
+function calculateAlpha ([event, container]) {
+  const { containerWidth, left } = containerBoundaries('', event, container);
+  const alpha = between(0, containerWidth, left) / containerWidth;
 
-    const { containerWidth, left } = containerBoundaries(state, event, state.container);
-    const alpha = between(0, containerWidth, left) / containerWidth;
-
-    return Object.assign({}, state, {alpha});
-  };
-}
-
-function setState (event, type, value) {
-  return function _setState (state) {
-    return {...state, [`${type}`]: value};
-  };
-}
-
-function setStateFromProps (props) {
-  return function _setStateFromProps (state) {
-    if ('color' in props) {
-      props.color = tinycolor(props.color).toHsv();
-      // props.color.h /= 360;
-    }
-
-    return {
-      ...state,
-
-      ...props
-    };
-  };
+  return alpha;
 }
 
 export default function Alpha ({DOM, props$}) {
@@ -68,49 +43,18 @@ export default function Alpha ({DOM, props$}) {
   const containerEl$ = container$
     .elements()
     .drop(1)
-    .compose(sample(100))
-    .map(el => el[0].getBoundingClientRect())
-    .map(value => setState('nil', 'container', value));
-
-  const mouseDown$ = container$
-    .events('mousedown')
-    .map(ev => setState(ev, 'mouseIsDown', true));
+    .compose(sample(500))
+    .map(el => el[0].getBoundingClientRect());
 
   const mouseMove$ = container$
     .events('mousemove');
 
-  const click$ = container$
-    .events('click');
-
-  const update$ = xs.merge(click$, mouseMove$)
-    .map(ev => updateAlpha(ev));
-
-  const mouseUp$ = DOM
-    .select('document')
-    .events('mouseup')
-    .map(ev => setState(ev, 'mouseIsDown', false));
-
-  const stateFromProps$ = props$.map(setStateFromProps);
-
-  const initialState = {
-    alpha: 1,
-    mouseIsDown: false,
-    container: { width: 0, height: 0 }
-  };
-
-  const action$ = xs.merge(
-    containerEl$,
-    mouseDown$,
-    mouseUp$,
-    update$,
-    stateFromProps$
-  );
-
-  const state$ = action$.fold((state, action) => action(state), initialState);
-  const alpha$ = state$.map(state => state.alpha);
+  const alpha$ = xs.combine(mouseMove$, containerEl$)
+    .addListener({next: (ev) => calculateAlpha(ev)});
+    // .dropRepeats()
 
   return {
-    DOM: xs.combine(state$, props$).map(view),
+    DOM: xs.combine(props$, alpha$, containerEl$).map(view),
     alpha$
   };
 }
