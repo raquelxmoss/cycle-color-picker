@@ -3,6 +3,9 @@ import { div } from '@cycle/dom';
 import dropRepeats from 'xstream/extra/dropRepeats';
 import { sample } from '../operators';
 import { between, containerBoundaries } from '../helpers';
+import { hueStyle } from '../styles/hue';
+import tinycolor from 'tinycolor2';
+import css from 'stylin';
 
 function updateHue (event) {
   return function _updateHue (state) {
@@ -10,6 +13,7 @@ function updateHue (event) {
 
     const { containerWidth, left } = containerBoundaries(state, event, state.container);
     const hue = between(0, containerWidth, left) / containerWidth;
+    console.log(hue)
 
     return Object.assign({}, state, {hue});
   };
@@ -23,11 +27,11 @@ function setState (event, type, value) {
 
 function view ([state, props]) {
   const hueIndicatorStyle = {
-    left: `${state.container.width * props.color.h}px`
+    left: `${state.container.width * state.hue}px`
   };
 
   return (
-    div('.hue-container', [
+    div(`.hue-container ${css.unimportant(hueStyle)}`, [
       div('.hue', [
         div('.hue-indicator', {style: hueIndicatorStyle})
       ])
@@ -65,7 +69,7 @@ export default function Hue ({DOM, props$}) {
     .map(ev => setState(ev, 'mouseIsDown', false));
 
   const initialState = {
-    hue: 255,
+    hue: 0,
     mouseIsDown: false,
     container: { width: 0, height: 0 }
   };

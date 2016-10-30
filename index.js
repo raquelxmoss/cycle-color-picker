@@ -15,9 +15,7 @@ function view (state) {
         h1('.title', 'Cycle Color Picker'),
         h2('.intro-text', 'A color picker component for Cycle.js')
       ]),
-      div('.pickers', [
-        div('.left', [state])
-      ])
+      div([state])
     ])
   );
 }

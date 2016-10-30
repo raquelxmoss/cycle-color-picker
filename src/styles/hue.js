@@ -1,4 +1,4 @@
-export const hue = {
+export const hueStyle = {
   'position': 'relative',
   'height': '10px',
   'margin-bottom': '10px',
