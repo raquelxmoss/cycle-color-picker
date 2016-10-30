@@ -8,8 +8,6 @@ import {
 } from './helpers';
 
 const update = {
-  alpha: (event) => updateChannel(event, 'alpha', (x) => ({a: x})),
-  hue: (event) => updateChannel(event, 'hue', (x) => ({h: x})),
   saturation: (event) => updateChannel(event, 'saturation', (x, y) => ({s: x, v: 1 - y}))
 };
 
@@ -163,14 +161,11 @@ function changeColorInputFormat () {
 }
 
 export default function makeReducer$ ({DOM, props$}) {
-  // parent
-  //
   const mouseUp$ = DOM
     .select('document')
     .events('mouseup')
     .map(ev => state => ({...state, activeInput: state.activeInput.set('none')}));
 
-  //parent
   const setStateFromHexInput$ = DOM
     .select('.hex-input')
     .events('input')
@@ -178,7 +173,6 @@ export default function makeReducer$ ({DOM, props$}) {
     .filter(ev => tinycolor(ev.target.value).isValid())
     .map(ev => setStateFromInput({value: ev.target.value}));
 
-  // text input
   const inputSwitcher$ = DOM
     .select('.switcher')
     .events('click')
@@ -195,8 +189,6 @@ export default function makeReducer$ ({DOM, props$}) {
     mouseUp$,
 
     makeInputElementReducer$('saturation', DOM),
-    makeInputElementReducer$('hue', DOM),
-    makeInputElementReducer$('alpha', DOM),
     makeTextInputElementReducer$('hsla', DOM),
     makeTextInputElementReducer$('rgba', DOM)
   );

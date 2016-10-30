@@ -1,4 +1,4 @@
-export const saturation = {
+export const saturationValueStyle = {
   'position': 'relative',
   'height': '127px',
   'width': '100%',

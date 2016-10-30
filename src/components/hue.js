@@ -4,7 +4,6 @@ import dropRepeats from 'xstream/extra/dropRepeats';
 import { sample } from '../operators';
 import { between, containerBoundaries } from '../helpers';
 import { hueStyle } from '../styles/hue';
-import tinycolor from 'tinycolor2';
 import css from 'stylin';
 
 function updateHue (event) {
@@ -13,7 +12,6 @@ function updateHue (event) {
 
     const { containerWidth, left } = containerBoundaries(state, event, state.container);
     const hue = between(0, containerWidth, left) / containerWidth;
-    console.log(hue)
 
     return Object.assign({}, state, {hue});
   };

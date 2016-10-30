@@ -67,47 +67,7 @@ function renderInputSwitcher (state) {
   );
 }
 
-function renderSaturationInput (state) {
-  const saturationBackground = `hsl(${state.color.h * 360}, 100%, 50%)`;
-  const saturationIndicatorColor = state.color.v < 0.5 ? '#fff' : '#000';
 
-  const saturationIndicatorStyle = {
-    left: `${state.saturationContainer.width * state.color.s}px`,
-    top: `${state.saturationContainer.height * (1 - state.color.v)}px`,
-    'border-color': `${saturationIndicatorColor}`
-  };
-
-  return (
-    div('.saturation', [
-      div('.white-overlay'),
-      div('.saturation-color', {style: {background: saturationBackground}}),
-      div('.grey-overlay'),
-      div('.saturation-indicator', {style: saturationIndicatorStyle})
-    ])
-  );
-}
-
-
-function renderAlphaInput (state) {
-  const alphaIndicatorStyle = {
-    left: `${state.alphaContainer.width * state.color.a}px`
-  };
-
-  const color = tinycolor.fromRatio(state.color);
-
-  const gradientStart = color.clone().setAlpha(0);
-  const gradientStyle = {background: `linear-gradient(to right, ${tinycolor(gradientStart).toRgbString()}  0%, ${color.toHexString()} 100%)`};
-
-  return (
-    div('.alpha-container', [
-      div('.alpha', [
-        div('.checkerboard'),
-        div('.gradient-overlay', {style: gradientStyle}),
-        div('.alpha-indicator', {style: alphaIndicatorStyle})
-      ])
-    ])
-  );
-}
 
 function renderSwatch (state) {
   const color = tinycolor.fromRatio(state.color);
@@ -130,10 +90,6 @@ export default function view (state) {
       renderSaturationInput(state),
       div('.controls-container', [
         renderSwatch(state),
-        div('.sliders', [
-          renderHueInput(state),
-          renderAlphaInput(state)
-        ])
       ]),
       div('.inputs-container', [
         renderColorInputs(state),
