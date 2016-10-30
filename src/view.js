@@ -87,19 +87,6 @@ function renderSaturationInput (state) {
   );
 }
 
-function renderHueInput (state) {
-  const hueIndicatorStyle = {
-    left: `${state.hueContainer.width * state.color.h}px`
-  };
-
-  return (
-    div('.hue-container', [
-      div('.hue', [
-        div('.hue-indicator', {style: hueIndicatorStyle})
-      ])
-    ])
-  );
-}
 
 function renderAlphaInput (state) {
   const alphaIndicatorStyle = {

@@ -1,8 +1,6 @@
 import tinycolor from 'tinycolor2';
 
-export function containerBoundaries (state, event, type) {
-  const container = state[`${type}Container`];
-
+export function containerBoundaries (state, event, container) {
   const containerWidth = container.width;
   const containerHeight = container.height;
   const containerLeft = container.left;

@@ -1,8 +1,8 @@
 import {run} from '@cycle/xstream-run';
 import {div, h1, h2, makeDOMDriver} from '@cycle/dom';
 import xs from 'xstream';
-import isolate from '@cycle/isolate';
-import Alpha from './src/components/alpha';
+// import isolate from '@cycle/isolate';
+import Hue from './src/components/hue';
 
 const drivers = {
   DOM: makeDOMDriver('.app')
@@ -24,8 +24,8 @@ function view (state) {
 
 function app (sources) {
   const props$ = xs.of({color: '#C3209F'});
-  const alpha$ = Alpha({...sources, props$});
-  const state$ = alpha$.DOM
+  const hue$ = Hue({...sources, props$});
+  const state$ = hue$.DOM;
 
   return {
     DOM: state$.map(view)

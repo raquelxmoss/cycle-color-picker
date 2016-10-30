@@ -1,25 +1,15 @@
 import xs from 'xstream';
-import throttle from 'xstream/extra/throttle';
 import dropRepeats from 'xstream/extra/dropRepeats';
 import { div } from '@cycle/dom';
-import { between } from '../helpers';
+import { between, containerBoundaries } from '../helpers';
+import { sample } from '../operators';
 import tinycolor from 'tinycolor2';
 import { alphaStyle } from '../styles/alpha';
 import css from 'stylin';
 
-function sample (interval) {
-  return function sampleOperator (stream) {
-    const periodic$ = xs.periodic(interval);
-
-    return stream
-      .map(event => periodic$.mapTo(event))
-      .flatten();
-  };
-}
-// view
 function view ([state, props]) {
   const alphaIndicatorStyle = {
-    left: `${state.container.width * state.alpha}px`,
+    left: `${state.container.width * state.alpha}px`
   };
 
   const color = tinycolor.fromRatio(props.color);
@@ -39,26 +29,11 @@ function view ([state, props]) {
   );
 }
 
-// helper
-function containerBoundaries (state, event) {
-  const container = state.container;
-
-  const containerWidth = container.width;
-  const containerLeft = container.left;
-  const left = event.pageX - (containerLeft + window.scrollX);
-
-  return {
-    containerWidth,
-    left
-  };
-}
-
-// model
 function updateAlpha (event) {
   return function _updateAlpha (state) {
     if (!state.mouseIsDown) { return state; }
 
-    const { containerWidth, left } = containerBoundaries(state, event);
+    const { containerWidth, left } = containerBoundaries(state, event, state.container);
     const alpha = between(0, containerWidth, left) / containerWidth;
 
     return Object.assign({}, state, {alpha});
@@ -95,12 +70,10 @@ export default function Alpha ({DOM, props$}) {
   const update$ = xs.merge(click$, mouseMove$)
     .map(ev => updateAlpha(ev));
 
-  // TODO: Send actions
-
   const mouseUp$ = DOM
     .select('document')
     .events('mouseup')
-    .map(ev => setState(event, 'mouseIsDown', false));
+    .map(ev => setState(ev, 'mouseIsDown', false));
 
   const initialState = {
     alpha: 1,
@@ -115,7 +88,7 @@ export default function Alpha ({DOM, props$}) {
     update$
   );
 
-  const state$ = action$.fold((state, action) => action(state), initialState)
+  const state$ = action$.fold((state, action) => action(state), initialState);
 
   return {
     DOM: xs.combine(state$, props$).map(view),
