@@ -46,6 +46,21 @@ function setState (event, type, value) {
   };
 }
 
+function setStateFromProps (props) {
+  return function _setStateFromProps (state) {
+    if ('color' in props) {
+      props.color = tinycolor(props.color).toHsv();
+      // props.color.h /= 360;
+    }
+
+    return {
+      ...state,
+
+      ...props
+    };
+  };
+}
+
 export default function Alpha ({DOM, props$}) {
   const container$ = DOM
     .select('.alpha-container');
@@ -75,6 +90,8 @@ export default function Alpha ({DOM, props$}) {
     .events('mouseup')
     .map(ev => setState(ev, 'mouseIsDown', false));
 
+  const stateFromProps$ = props$.map(setStateFromProps);
+
   const initialState = {
     alpha: 1,
     mouseIsDown: false,
@@ -85,13 +102,15 @@ export default function Alpha ({DOM, props$}) {
     containerEl$,
     mouseDown$,
     mouseUp$,
-    update$
+    update$,
+    stateFromProps$
   );
 
   const state$ = action$.fold((state, action) => action(state), initialState);
+  const alpha$ = state$.map(state => state.alpha);
 
   return {
     DOM: xs.combine(state$, props$).map(view),
-    alpha$: state$.compose(dropRepeats((state) => JSON.stringify(state) === JSON.stringify(state)))
+    alpha$
   };
 }

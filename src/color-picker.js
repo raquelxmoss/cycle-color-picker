@@ -1,41 +1,103 @@
 import xs from 'xstream';
 import dropRepeats from 'xstream/extra/droprepeats';
 import tinycolor from 'tinycolor2';
+import { div } from '@cycle/dom';
 
-import {either} from './helpers';
-import view from './view';
-import makeReducer$ from './reducers';
+import SaturationValue from './components/saturation-value';
+import Hue from './components/hue';
+import Alpha from './components/alpha';
+
+// import view from './view';
+
+function view ([state, saturationValue, hue, alpha]) {
+  const swatch = div('.swatchy', {style: {
+    width: '100px',
+    height: '100px',
+    background: tinycolor.fromRatio(state.color).toRgbString()
+  }});
+
+  return (
+    div('.color-picker', [
+      saturationValue,
+      hue,
+      alpha,
+      swatch
+    ])
+  );
+}
+
+function updateColor (value) {
+  return function _updateColor (state) {
+    const newColor = Object.assign({}, state.color, value);
+
+    return Object.assign({}, state, {color: newColor});
+  };
+}
+
+function setStateFromProps (props) {
+  return function _setStateFromProps (state) {
+    if ('color' in props) {
+      props.color = tinycolor(props.color).toHsv();
+    }
+
+    return {
+      ...state,
+
+      ...props
+    };
+  };
+}
 
 export default function ColorPicker ({DOM, props$ = xs.empty()}) {
-  const initialState = {
-    activeInput: either(['none', 'hue', 'saturation', 'alpha'], 'none'),
-    saturationContainer: {width: 0, height: 0},
-    hueContainer: {width: 0},
-    color: props$.take(1).map(props => props.color),
-    colorInputFormat: either(['hex', 'rgba', 'hsla'], 'hex')
-  };
+  const initialState = {color: {h: 0, s: 0, v: 0, a: 0}};
 
+  const saturationValueComponent$ = SaturationValue({DOM, props$});
+  const hueComponent$ = Hue({DOM, props$});
+  const alphaComponent$ = Alpha({DOM, props$});
 
-  // const saturation$ = SaturationLightness({DOM, props$ = xs.of(s, v)});
-  // const hue$ = Hue({DOM, props$ = xs.of(h)});
+  const setStateFromProps$ = props$
+    .map(setStateFromProps);
 
-  const action$ = makeReducer$({DOM, props$});
+  const alpha$ = alphaComponent$
+    .alpha$
+    .map(alpha => ({a: alpha}));
+
+  const hue$ = hueComponent$
+    .hue$
+    .map(hue => ({h: hue}));
+
+  const saturationValue$ = saturationValueComponent$
+    .saturationValue$
+    .map(saturationValue => ({s: saturationValue.saturation, v: saturationValue.value}));
+
+  const colorParts$ = xs.merge(
+    saturationValue$,
+    hue$,
+    alpha$
+  ).map(value => updateColor(value));
+
+  const action$ = xs.merge(
+    colorParts$,
+    setStateFromProps$
+  );
 
   const state$ = action$
     .fold((state, action) => action(state), initialState)
-    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b))) // TODO do this better
+    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
     .remember();
 
-  const a$ = state$.map(state => state.color.a).take(1);
-  const alpha$ = Alpha({DOM, props$: xs.of(a$)});
-
   const color$ = state$
-    .map(state => {
-      return tinycolor.fromRatio(state.color).toRgbString();
-    });
+    .map(state => tinycolor.fromRatio(state.color).toRgbString());
+
+  const DOM$ = xs.combine(
+    state$,
+    saturationValueComponent$.DOM,
+    hueComponent$.DOM,
+    alphaComponent$.DOM
+  ).map(view);
 
   return {
-    DOM: state$.map(view),
+    DOM: DOM$,
     color$
   };
 }

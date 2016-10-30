@@ -52,6 +52,21 @@ function update (event) {
   };
 }
 
+function setStateFromProps (props) {
+  return function _setStateFromProps (state) {
+    if ('color' in props) {
+      props.color = tinycolor(props.color).toHsv();
+      // props.color.h /= 360;
+    }
+
+    return {
+      ...state,
+      saturation: props.color.s,
+      value: props.color.v
+    };
+  };
+}
+
 export default function SaturationValue ({DOM, props$}) {
   const container$ = DOM
     .select('.saturation-lightness-container');
@@ -81,6 +96,9 @@ export default function SaturationValue ({DOM, props$}) {
     .events('mouseup')
     .map(ev => setState(ev, 'mouseIsDown', false));
 
+  const stateFromProps$ = props$
+    .map(setStateFromProps);
+
   const initialState = {
     saturation: 0,
     value: 0,
@@ -92,13 +110,15 @@ export default function SaturationValue ({DOM, props$}) {
     containerEl$,
     mouseDown$,
     mouseUp$,
-    update$
+    update$,
+    stateFromProps$
   );
 
   const state$ = actions$.fold((state, action) => action(state), initialState);
+  const saturationValue$ = state$.map(state => ({saturation: state.saturation, value: state.value}));
 
   return {
     DOM: xs.combine(state$, props$).map(view),
-    saturationValue$: state$.compose(dropRepeats((state) => JSON.stringify(state) === JSON.stringify(state)))
+    saturationValue$
   };
 }

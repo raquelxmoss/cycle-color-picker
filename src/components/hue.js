@@ -1,10 +1,10 @@
 import xs from 'xstream';
 import { div } from '@cycle/dom';
-import dropRepeats from 'xstream/extra/dropRepeats';
 import { sample } from '../operators';
 import { between, containerBoundaries } from '../helpers';
 import { hueStyle } from '../styles/hue';
 import css from 'stylin';
+import tinycolor from 'tinycolor2';
 
 function updateHue (event) {
   return function _updateHue (state) {
@@ -37,6 +37,20 @@ function view ([state, props]) {
   );
 }
 
+function setStateFromProps (props) {
+  return function _setStateFromProps (state) {
+    if ('color' in props) {
+      props.color = tinycolor(props.color).toHsv();
+      props.color.h /= 360;
+    }
+
+    return {
+      ...state,
+      hue: props.color.h
+    };
+  };
+}
+
 export default function Hue ({DOM, props$}) {
   const container$ = DOM
     .select('.hue-container');
@@ -66,6 +80,9 @@ export default function Hue ({DOM, props$}) {
     .events('mouseup')
     .map(ev => setState(ev, 'mouseIsDown', false));
 
+  const stateFromProps$ = props$
+    .map(setStateFromProps);
+
   const initialState = {
     hue: 0,
     mouseIsDown: false,
@@ -76,13 +93,15 @@ export default function Hue ({DOM, props$}) {
     containerEl$,
     mouseDown$,
     mouseUp$,
-    update$
+    update$,
+    stateFromProps$
   );
 
   const state$ = actions$.fold((state, action) => action(state), initialState);
+  const hue$ = state$.map(state => state.hue);
 
   return {
     DOM: xs.combine(state$, props$).map(view),
-    hue$: state$.compose(dropRepeats((state) => JSON.stringify(state) === JSON.stringify(state)))
+    hue$
   };
 }
