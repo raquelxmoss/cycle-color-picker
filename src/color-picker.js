@@ -7,18 +7,17 @@ import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
 import Alpha from './components/alpha';
 
-function view ([state, saturationValue, hue, alpha]) {
+function view (alpha) {
+  debugger
   const swatch = div('.swatchy', {style: {
     width: '100px',
-    height: '100px',
-    background: tinycolor.fromRatio(state.color).toRgbString()
+    height: '100px'
+    // background: tinycolor.fromRatio(state.color).toRgbString()
   }});
 
   return (
     div('.color-picker', [
-      saturationValue,
-      hue,
-      alpha,
+      JSON.stringify(alpha),
       swatch
     ])
   );
@@ -49,53 +48,47 @@ function setStateFromProps (props) {
 export default function ColorPicker ({DOM, props$ = xs.empty()}) {
   const initialState = {color: {h: 0, s: 0, v: 0, a: 0}};
 
-  const saturationValueComponent$ = SaturationValue({DOM, props$});
-  const hueComponent$ = Hue({DOM, props$});
+  // const saturationValueComponent$ = SaturationValue({DOM, props$});
+  // const hueComponent$ = Hue({DOM, props$});
   const alphaComponent$ = Alpha({DOM, props$});
 
-  const setStateFromProps$ = props$
-    .map(setStateFromProps);
+  // const setStateFromProps$ = props$
+  //   .map(setStateFromProps);
 
-  const alpha$ = alphaComponent$
-    .alpha$
-    .map(alpha => ({a: alpha}));
+  // alphaComponent$.alpha$.addListener({next: (thing) => console.log(thing)});
+    // .map(alpha => ({a: alpha}));
 
-  const hue$ = hueComponent$
-    .hue$
-    .map(hue => ({h: hue}));
+  // const hue$ = hueComponent$
+  //   .hue$
+  //   .map(hue => ({h: hue}));
 
-  const saturationValue$ = saturationValueComponent$
-    .saturationValue$
-    .map(saturationValue => ({s: saturationValue.saturation, v: saturationValue.value}));
+  // const saturationValue$ = saturationValueComponent$
+  //   .saturationValue$
+  //   .map(saturationValue => ({s: saturationValue.saturation, v: saturationValue.value}));
 
-  const colorParts$ = xs.merge(
-    saturationValue$,
-    hue$,
-    alpha$
-  ).map(value => updateColor(value));
+  // const colorParts$ = xs.merge(
+    // saturationValue$,
+    // hue$,
+    // alpha$
+  // ).map(value => updateColor(value));
 
-  const action$ = xs.merge(
-    colorParts$,
-    setStateFromProps$
-  );
+  // const action$ = xs.merge(
+  //   colorParts$,
+  //   setStateFromProps$
+  // );
 
-  const state$ = action$
-    .fold((state, action) => action(state), initialState)
-    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
-    .remember();
+  // const state$ = action$
+  //   .fold((state, action) => action(state), initialState)
+  //   .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b))) // there's a thing in lodash for this maybe
+  //   .remember();
 
-  const color$ = state$
-    .map(state => tinycolor.fromRatio(state.color).toRgbString());
+  // const color$ = state$
+  //   .map(state => tinycolor.fromRatio(state.color).toRgbString());
 
-  const DOM$ = xs.combine(
-    state$,
-    saturationValueComponent$.DOM,
-    hueComponent$.DOM,
-    alphaComponent$.DOM
-  ).map(view);
+  const DOM$ = alphaComponent$.alpha$.map(view);
 
   return {
-    DOM: DOM$,
-    color$
+    DOM: DOM$
+    // color$
   };
 }

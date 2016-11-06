@@ -14,6 +14,7 @@ function view ([props, alpha, container]) {
 
   const color = tinycolor.fromRatio(props.color);
   const gradientStart = color.clone().setAlpha(0);
+
   const gradientStyle = {
     background: `linear-gradient(to right, ${tinycolor(gradientStart).toRgbString()}  0%, ${color.toHexString()} 100%)`
   };
@@ -50,8 +51,7 @@ export default function Alpha ({DOM, props$}) {
     .events('mousemove');
 
   const alpha$ = xs.combine(mouseMove$, containerEl$)
-    .addListener({next: (ev) => calculateAlpha(ev)});
-    // .dropRepeats()
+    .map(calculateAlpha);
 
   return {
     DOM: xs.combine(props$, alpha$, containerEl$).map(view),
