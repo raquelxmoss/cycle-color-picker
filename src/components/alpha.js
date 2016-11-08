@@ -1,13 +1,24 @@
 import xs from 'xstream';
-import dropRepeats from 'xstream/extra/dropRepeats';
 import { div } from '@cycle/dom';
-import { between, containerBoundaries } from '../helpers';
-import { sample } from '../operators';
 import tinycolor from 'tinycolor2';
-import { alphaStyle } from '../styles/alpha';
 import css from 'stylin';
 
-function view ([props, alpha, container]) {
+import { between, containerBoundaries } from '../helpers';
+import { alphaStyle } from '../styles/alpha';
+
+function getContainerWidth (selector) {
+  const container = document.querySelector(selector);
+
+  if (container) {
+    return container.getBoundingClientRect();
+  }
+
+  return {width: 0, height: 0};
+}
+
+function view ([props, alpha]) {
+  const container = getContainerWidth('.alpha-container');
+
   const alphaIndicatorStyle = {
     left: `${container.width * alpha}px`
   };
@@ -30,31 +41,51 @@ function view ([props, alpha, container]) {
   );
 }
 
-function calculateAlpha ([event, container]) {
+function calculateAlpha (event) {
+  const container = document.querySelector('.alpha-container').getBoundingClientRect();
+
   const { containerWidth, left } = containerBoundaries('', event, container);
   const alpha = between(0, containerWidth, left) / containerWidth;
 
   return alpha;
 }
 
+function setAlphaFromProps (props) {
+  if ('color' in props) {
+    const color = tinycolor(props.color).toHsv();
+    return color.a;
+  }
+}
+
 export default function Alpha ({DOM, props$}) {
   const container$ = DOM
     .select('.alpha-container');
 
-  const containerEl$ = container$
-    .elements()
-    .drop(1)
-    .compose(sample(500))
-    .map(el => el[0].getBoundingClientRect());
-
   const mouseMove$ = container$
     .events('mousemove');
 
-  const alpha$ = xs.combine(mouseMove$, containerEl$)
-    .map(calculateAlpha);
+  const mouseDown$ = container$
+    .events('mousedown');
+
+  const mouseUp$ = DOM
+    .select('document')
+    .events('mouseup');
+
+  const change$ = mouseDown$
+    .map(down => mouseMove$.endWhen(mouseUp$).map(calculateAlpha))
+    .flatten();
+
+  const alphaFromProps$ = props$
+    .map(setAlphaFromProps);
+
+  const alpha$ = xs.merge(
+    change$,
+    alphaFromProps$
+  )
+  .startWith(100);
 
   return {
-    DOM: xs.combine(props$, alpha$, containerEl$).map(view),
+    DOM: xs.combine(props$, alpha$).map(view),
     alpha$
   };
 }

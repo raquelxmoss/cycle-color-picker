@@ -7,8 +7,7 @@ import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
 import Alpha from './components/alpha';
 
-function view (alpha) {
-  debugger
+function view ([alpha]) {
   const swatch = div('.swatchy', {style: {
     width: '100px',
     height: '100px'
@@ -17,7 +16,7 @@ function view (alpha) {
 
   return (
     div('.color-picker', [
-      JSON.stringify(alpha),
+      alpha,
       swatch
     ])
   );
@@ -46,36 +45,10 @@ function setStateFromProps (props) {
 }
 
 export default function ColorPicker ({DOM, props$ = xs.empty()}) {
-  const initialState = {color: {h: 0, s: 0, v: 0, a: 0}};
-
-  // const saturationValueComponent$ = SaturationValue({DOM, props$});
-  // const hueComponent$ = Hue({DOM, props$});
+  // const initialState = {color: {h: 0, s: 0, v: 0, a: 0}};
+  //
   const alphaComponent$ = Alpha({DOM, props$});
-
-  // const setStateFromProps$ = props$
-  //   .map(setStateFromProps);
-
-  // alphaComponent$.alpha$.addListener({next: (thing) => console.log(thing)});
-    // .map(alpha => ({a: alpha}));
-
-  // const hue$ = hueComponent$
-  //   .hue$
-  //   .map(hue => ({h: hue}));
-
-  // const saturationValue$ = saturationValueComponent$
-  //   .saturationValue$
-  //   .map(saturationValue => ({s: saturationValue.saturation, v: saturationValue.value}));
-
-  // const colorParts$ = xs.merge(
-    // saturationValue$,
-    // hue$,
-    // alpha$
-  // ).map(value => updateColor(value));
-
-  // const action$ = xs.merge(
-  //   colorParts$,
-  //   setStateFromProps$
-  // );
+  const alpha$ = alphaComponent$.alpha$;
 
   // const state$ = action$
   //   .fold((state, action) => action(state), initialState)
@@ -85,10 +58,8 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
   // const color$ = state$
   //   .map(state => tinycolor.fromRatio(state.color).toRgbString());
 
-  const DOM$ = alphaComponent$.alpha$.map(view);
-
   return {
-    DOM: DOM$
-    // color$
+    DOM: alphaComponent$.DOM,
+    alpha$
   };
 }
