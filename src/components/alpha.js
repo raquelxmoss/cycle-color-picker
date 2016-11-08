@@ -42,7 +42,7 @@ function view ([props, alpha]) {
 }
 
 function calculateAlpha (event) {
-  const container = document.querySelector('.alpha-container').getBoundingClientRect();
+  const container = getContainerWidth('.alpha-container');
 
   const { containerWidth, left } = containerBoundaries('', event, container);
   const alpha = between(0, containerWidth, left) / containerWidth;
@@ -52,8 +52,7 @@ function calculateAlpha (event) {
 
 function setAlphaFromProps (props) {
   if ('color' in props) {
-    const color = tinycolor(props.color).toHsv();
-    return color.a;
+    return tinycolor(props.color).toHsv().a;
   }
 }
 
@@ -71,9 +70,17 @@ export default function Alpha ({DOM, props$}) {
     .select('document')
     .events('mouseup');
 
-  const change$ = mouseDown$
-    .map(down => mouseMove$.endWhen(mouseUp$).map(calculateAlpha))
+  const click$ = container$
+    .events('click');
+
+  const mouseDrag$ = mouseDown$
+    .map(down => mouseMove$.endWhen(mouseUp$))
     .flatten();
+
+  const change$ = xs.merge(
+    mouseDrag$,
+    click$
+  ).map(calculateAlpha);
 
   const alphaFromProps$ = props$
     .map(setAlphaFromProps);
