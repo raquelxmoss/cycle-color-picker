@@ -1,5 +1,15 @@
 import tinycolor from 'tinycolor2';
 
+export function getContainerWidth (selector) {
+  const container = document.querySelector(selector);
+
+  if (container) {
+    return container.getBoundingClientRect();
+  }
+
+  return {width: 0, height: 0};
+}
+
 export function containerBoundaries (state, event, container) {
   const containerWidth = container.width;
   const containerHeight = container.height;

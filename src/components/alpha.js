@@ -3,18 +3,8 @@ import { div } from '@cycle/dom';
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
 
-import { between, containerBoundaries } from '../helpers';
+import { between, containerBoundaries, getContainerWidth } from '../helpers';
 import { alphaStyle } from '../styles/alpha';
-
-function getContainerWidth (selector) {
-  const container = document.querySelector(selector);
-
-  if (container) {
-    return container.getBoundingClientRect();
-  }
-
-  return {width: 0, height: 0};
-}
 
 function view ([props, alpha]) {
   const container = getContainerWidth('.alpha-container');
@@ -88,8 +78,7 @@ export default function Alpha ({DOM, props$}) {
   const alpha$ = xs.merge(
     change$,
     alphaFromProps$
-  )
-  .startWith(100);
+  ).startWith(0);
 
   return {
     DOM: xs.combine(props$, alpha$).map(view),

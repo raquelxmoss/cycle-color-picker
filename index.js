@@ -3,7 +3,7 @@ import {div, h1, h2, makeDOMDriver} from '@cycle/dom';
 import xs from 'xstream';
 // import isolate from '@cycle/isolate';
 import ColorPicker from './src/color-picker';
-import Alpha from './src/components/alpha';
+import Hue from './src/components/hue';
 
 const drivers = {
   DOM: makeDOMDriver('.app')
@@ -23,9 +23,9 @@ function view (state) {
 
 function app ({DOM}) {
   const props$ = xs.of({color: '#C3209F'});
-  const alpha$ = Alpha({DOM, props$});
+  const hue$ = Hue({DOM, props$});
   // const colorPicker$ = ColorPicker({...sources, props$});
-  const state$ = alpha$.DOM;
+  const state$ = hue$.DOM;
   // alpha$.DOM
 
   return {

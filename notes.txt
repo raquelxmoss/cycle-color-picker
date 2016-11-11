@@ -1,5 +1,4 @@
 TODO:
-- drop repeats so things only update when they need to
 - abstract shared functions
 - refactor to send payload objects
 - work out the storing of hue -- * / / by 360 when and where.
@@ -10,3 +9,7 @@ TODO:
 get things to return literally just the sub-value
 handle state only in the parent
 pass it down
+
+
+- BUGS
+  - Things shit up when you resize -- I could add a listener for window resize events that will calculate the stuff again
