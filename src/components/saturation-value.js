@@ -1,25 +1,27 @@
 import xs from 'xstream';
-import dropRepeats from 'xstream/extra/dropRepeats';
 import { div } from '@cycle/dom';
-import { between, containerBoundaries } from '../helpers';
-import { sample } from '../operators';
 import tinycolor from 'tinycolor2';
-import { saturationValueStyle } from '../styles/saturation-value';
 import css from 'stylin';
 
-function view ([state, props]) {
+import { between, containerBoundaries, getContainerWidth } from '../helpers';
+import { saturationValueStyle } from '../styles/saturation-value';
+
+function view ([props, { saturation, value }]) {
+  const container = getContainerWidth('.saturation-value-container');
+
   const propsColor = tinycolor.fromRatio(props.color).toHsv();
+
   const background = `hsl(${propsColor.h}, 100%, 50%)`;
-  const indicatorColor = state.value < 0.5 ? '#fff' : '#000';
+  const indicatorColor = value < 0.5 ? '#fff' : '#000';
 
   const indicatorStyle = {
-    left: `${state.container.width * state.saturation}px`,
-    top: `${state.container.height * (1 - state.value)}px`,
+    left: `${container.width * saturation}px`,
+    top: `${container.height * (1 - value)}px`,
     'border-color': `${indicatorColor}`
   };
 
   return (
-    div(`.saturation-lightness-container ${css.unimportant(saturationValueStyle)}`, [
+    div(`.saturation-value-container ${css.unimportant(saturationValueStyle)}`, [
       div('.white-overlay'),
       div('.saturation-color', {style: {background}}),
       div('.grey-overlay'),
@@ -28,97 +30,66 @@ function view ([state, props]) {
   );
 }
 
-function setState (event, type, value) {
-  return function _setState (state) {
-    return {...state, [`${type}`]: value};
-  };
+function calculateSaturationValue (event) {
+  const container = getContainerWidth('.saturation-value-container');
+
+  const {
+    containerWidth,
+    containerHeight,
+    top,
+    left
+  } = containerBoundaries('', event, container);
+
+  const saturation = between(0, containerWidth, left) / containerWidth;
+  const value = 1 - (between(0, containerHeight, top) / containerHeight);
+
+  return { saturation, value };
 }
 
-function update (event) {
-  return function _update (state) {
-    if (!state.mouseIsDown) { return state; }
+function setSaturationValueFromProps (props) {
+  if ('color' in props) {
+    const color = tinycolor(props.color).toHsv();
 
-    const {
-      containerWidth,
-      containerHeight,
-      top,
-      left
-    } = containerBoundaries(state, event, state.container);
-
-    const x = between(0, containerWidth, left) / containerWidth;
-    const y = between(0, containerHeight, top) / containerHeight;
-
-    return Object.assign({}, state, {saturation: x, value: 1 - y});
-  };
-}
-
-function setStateFromProps (props) {
-  return function _setStateFromProps (state) {
-    if ('color' in props) {
-      props.color = tinycolor(props.color).toHsv();
-      // props.color.h /= 360;
-    }
-
-    return {
-      ...state,
-      saturation: props.color.s,
-      value: props.color.v
-    };
-  };
+    return { saturation: color.s, value: color.v };
+  }
 }
 
 export default function SaturationValue ({DOM, props$}) {
   const container$ = DOM
-    .select('.saturation-lightness-container');
-
-  const containerEl$ = container$
-    .elements()
-    .drop(1)
-    .compose(sample(100))
-    .map(el => el[0].getBoundingClientRect())
-    .map(value => setState('nil', 'container', value));
-
-  const mouseDown$ = container$
-    .events('mousedown')
-    .map(ev => setState(ev, 'mouseIsDown', true));
+    .select('.saturation-value-container');
 
   const mouseMove$ = container$
     .events('mousemove');
 
-  const click$ = container$
-    .events('click');
-
-  const update$ = xs.merge(click$, mouseMove$)
-    .map(ev => update(ev));
+  const mouseDown$ = container$
+    .events('mousedown');
 
   const mouseUp$ = DOM
     .select('document')
-    .events('mouseup')
-    .map(ev => setState(ev, 'mouseIsDown', false));
+    .events('mouseup');
 
-  const stateFromProps$ = props$
-    .map(setStateFromProps);
+  const click$ = container$
+    .events('click');
 
-  const initialState = {
-    saturation: 0,
-    value: 0,
-    mouseIsDown: false,
-    container: { width: 0, height: 0 }
-  };
+  const mouseDrag$ = mouseDown$
+    .map(down => mouseMove$.endWhen(mouseUp$))
+    .flatten();
 
-  const actions$ = xs.merge(
-    containerEl$,
-    mouseDown$,
-    mouseUp$,
-    update$,
-    stateFromProps$
-  );
+  const change$ = xs.merge(
+    mouseDrag$,
+    click$
+  ).map(calculateSaturationValue);
 
-  const state$ = actions$.fold((state, action) => action(state), initialState);
-  const saturationValue$ = state$.map(state => ({saturation: state.saturation, value: state.value}));
+  const saturationValueFromProps$ = props$
+    .map(setSaturationValueFromProps);
+
+  const saturationValue$ = xs.merge(
+    change$,
+    saturationValueFromProps$
+  ).startWith(0);
 
   return {
-    DOM: xs.combine(state$, props$).map(view),
+    DOM: xs.combine(props$, saturationValue$).map(view),
     saturationValue$
   };
 }

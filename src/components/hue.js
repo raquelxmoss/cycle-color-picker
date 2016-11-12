@@ -34,8 +34,8 @@ function calculateHue (event) {
 
 function setHueFromProps (props) {
   if ('color' in props) {
-    const color = tinycolor(props.color).toHsv().h;
-    return color / 360;
+    const hue = tinycolor(props.color).toHsv().h;
+    return hue / 360;
   }
 }
 
