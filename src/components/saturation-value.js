@@ -8,8 +8,7 @@ import { saturationValueStyle } from '../styles/saturation-value';
 
 function view ([props, { saturation, value }]) {
   const container = getContainerWidth('.saturation-value-container');
-
-  const propsColor = tinycolor.fromRatio(props.color).toHsv();
+  const propsColor = tinycolor.fromRatio(props).toHsv();
 
   const background = `hsl(${propsColor.h}, 100%, 50%)`;
   const indicatorColor = value < 0.5 ? '#fff' : '#000';
@@ -47,14 +46,12 @@ function calculateSaturationValue (event) {
 }
 
 function setSaturationValueFromProps (props) {
-  if ('color' in props) {
-    const color = tinycolor(props.color).toHsv();
+  const color = tinycolor(props).toHsv();
 
-    return { saturation: color.s, value: color.v };
-  }
+  return { saturation: color.s, value: color.v };
 }
 
-export default function SaturationValue ({DOM, props$}) {
+export default function SaturationValue ({DOM, color$}) {
   const container$ = DOM
     .select('.saturation-value-container');
 
@@ -80,7 +77,7 @@ export default function SaturationValue ({DOM, props$}) {
     click$
   ).map(calculateSaturationValue);
 
-  const saturationValueFromProps$ = props$
+  const saturationValueFromProps$ = color$
     .map(setSaturationValueFromProps);
 
   const saturationValue$ = xs.merge(
@@ -89,7 +86,7 @@ export default function SaturationValue ({DOM, props$}) {
   ).startWith(0);
 
   return {
-    DOM: xs.combine(props$, saturationValue$).map(view),
+    DOM: xs.combine(color$, saturationValue$).map(view),
     saturationValue$
   };
 }

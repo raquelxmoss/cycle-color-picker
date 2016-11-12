@@ -1,9 +1,7 @@
 import {run} from '@cycle/xstream-run';
 import {div, h1, h2, makeDOMDriver} from '@cycle/dom';
 import xs from 'xstream';
-// import isolate from '@cycle/isolate';
 import ColorPicker from './src/color-picker';
-import SaturationValue from './src/components/saturation-value';
 
 const drivers = {
   DOM: makeDOMDriver('.app')
@@ -23,10 +21,8 @@ function view (state) {
 
 function app ({DOM}) {
   const props$ = xs.of({color: '#C3209F'});
-  const saturationValue$ = SaturationValue({DOM, props$});
-  // const colorPicker$ = ColorPicker({...sources, props$});
-  const state$ = saturationValue$.DOM;
-  // alpha$.DOM
+  const colorPicker$ = ColorPicker({DOM, props$});
+  const state$ = colorPicker$.DOM;
 
   return {
     DOM: state$.map(view)

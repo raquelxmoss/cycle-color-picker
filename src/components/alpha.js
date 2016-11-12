@@ -13,7 +13,7 @@ function view ([props, alpha]) {
     left: `${container.width * alpha}px`
   };
 
-  const color = tinycolor.fromRatio(props.color);
+  const color = tinycolor.fromRatio(props);
   const gradientStart = color.clone().setAlpha(0);
 
   const gradientStyle = {
@@ -41,12 +41,10 @@ function calculateAlpha (event) {
 }
 
 function setAlphaFromProps (props) {
-  if ('color' in props) {
-    return tinycolor(props.color).toHsv().a;
-  }
+  return tinycolor(props).toHsv().a;
 }
 
-export default function Alpha ({DOM, props$}) {
+export default function Alpha ({DOM, color$}) {
   const container$ = DOM
     .select('.alpha-container');
 
@@ -72,7 +70,7 @@ export default function Alpha ({DOM, props$}) {
     click$
   ).map(calculateAlpha);
 
-  const alphaFromProps$ = props$
+  const alphaFromProps$ = color$
     .map(setAlphaFromProps);
 
   const alpha$ = xs.merge(
@@ -81,7 +79,7 @@ export default function Alpha ({DOM, props$}) {
   ).startWith(0);
 
   return {
-    DOM: xs.combine(props$, alpha$).map(view),
+    DOM: xs.combine(color$, alpha$).map(view),
     alpha$
   };
 }

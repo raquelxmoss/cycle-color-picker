@@ -1,5 +1,4 @@
 import xs from 'xstream';
-import dropRepeats from 'xstream/extra/droprepeats';
 import tinycolor from 'tinycolor2';
 import { div } from '@cycle/dom';
 
@@ -7,59 +6,76 @@ import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
 import Alpha from './components/alpha';
 
-function view ([alpha]) {
+function view ([saturationValue, hue, alpha, color]) {
   const swatch = div('.swatchy', {style: {
     width: '100px',
-    height: '100px'
-    // background: tinycolor.fromRatio(state.color).toRgbString()
+    height: '100px',
+    background: tinycolor.fromRatio(color).toRgbString()
   }});
 
   return (
     div('.color-picker', [
+      saturationValue,
+      hue,
       alpha,
       swatch
     ])
   );
 }
 
-function updateColor (value) {
-  return function _updateColor (state) {
-    const newColor = Object.assign({}, state.color, value);
+function colorFromProps (props) {
+  if ('color' in props) {
+    const color = tinycolor(props).toHsv();
+    color.h /= 360;
 
-    return Object.assign({}, state, {color: newColor});
-  };
+    return color;
+  }
 }
 
-function setStateFromProps (props) {
-  return function _setStateFromProps (state) {
-    if ('color' in props) {
-      props.color = tinycolor(props.color).toHsv();
-    }
-
-    return {
-      ...state,
-
-      ...props
-    };
+function calculateColor ([{saturation, value}, hue, alpha]) {
+  const color = {
+    h: hue,
+    s: saturation,
+    v: value,
+    a: alpha
   };
+
+  return color;
 }
 
 export default function ColorPicker ({DOM, props$ = xs.empty()}) {
-  // const initialState = {color: {h: 0, s: 0, v: 0, a: 0}};
-  //
-  const alphaComponent$ = Alpha({DOM, props$});
+  const colorFromProps$ = props$.map(colorFromProps);
+
+  const colorProxy$ = xs.create();
+
+  const saturationValueComponent$ = SaturationValue({DOM, color$: xs.of('pink')});
+  const hueComponent$ = Hue({DOM, color$: xs.of('pink')});
+  const alphaComponent$ = Alpha({DOM, color$: xs.of('pink')});
+
+  const saturationValue$ = saturationValueComponent$.saturationValue$;
+  const hue$ = hueComponent$.hue$;
   const alpha$ = alphaComponent$.alpha$;
 
-  // const state$ = action$
-  //   .fold((state, action) => action(state), initialState)
-  //   .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b))) // there's a thing in lodash for this maybe
-  //   .remember();
+  const color$ = xs.combine(
+    saturationValue$,
+    hue$,
+    alpha$,
+    colorFromProps$
+  ).map(calculateColor);
 
-  // const color$ = state$
-  //   .map(state => tinycolor.fromRatio(state.color).toRgbString());
+  // colorProxy$.imitate(color$);
+
+  const vtree$ = xs.combine(
+    saturationValueComponent$.DOM,
+    hueComponent$.DOM,
+    alphaComponent$.DOM,
+    color$
+  );
+
+  const colorSink$ = color$.map(color => tinycolor.fromRatio(color).toRgbString());
 
   return {
-    DOM: alphaComponent$.DOM,
-    alpha$
+    DOM: vtree$.map(view),
+    color$ : colorSink$
   };
 }

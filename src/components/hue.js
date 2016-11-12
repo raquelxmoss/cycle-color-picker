@@ -6,7 +6,7 @@ import tinycolor from 'tinycolor2';
 import { between, containerBoundaries, getContainerWidth } from '../helpers';
 import { hueStyle } from '../styles/hue';
 
-function view ([props, hue]) {
+function view (hue) {
   const container = getContainerWidth('.hue-container');
 
   const hueIndicatorStyle = {
@@ -33,13 +33,10 @@ function calculateHue (event) {
 }
 
 function setHueFromProps (props) {
-  if ('color' in props) {
-    const hue = tinycolor(props.color).toHsv().h;
-    return hue / 360;
-  }
+  return tinycolor(props).toHsv().h / 360;
 }
 
-export default function Hue ({DOM, props$}) {
+export default function Hue ({DOM, color$}) {
   const container$ = DOM
     .select('.hue-container');
 
@@ -65,7 +62,7 @@ export default function Hue ({DOM, props$}) {
     click$
   ).map(calculateHue);
 
-  const hueFromProps$ = props$
+  const hueFromProps$ = color$
     .map(setHueFromProps);
 
   const hue$ = xs.merge(
@@ -74,7 +71,7 @@ export default function Hue ({DOM, props$}) {
   ).startWith(0);
 
   return {
-    DOM: xs.combine(props$, hue$).map(view),
+    DOM: hue$.map(view),
     hue$
   };
 }
