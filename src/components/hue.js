@@ -33,7 +33,7 @@ function calculateHue (event) {
 }
 
 function setHueFromProps (props) {
-  return tinycolor(props).toHsv().h / 360;
+  return tinycolor.fromRatio(props).toHsv().h / 360;
 }
 
 export default function Hue ({DOM, color$}) {
@@ -57,7 +57,7 @@ export default function Hue ({DOM, color$}) {
     .map(down => mouseMove$.endWhen(mouseUp$))
     .flatten();
 
-  const change$ = xs.merge(
+  const update$ = xs.merge(
     mouseDrag$,
     click$
   ).map(calculateHue);
@@ -66,12 +66,12 @@ export default function Hue ({DOM, color$}) {
     .map(setHueFromProps);
 
   const hue$ = xs.merge(
-    change$,
+    update$,
     hueFromProps$
   ).startWith(0);
 
   return {
     DOM: hue$.map(view),
-    hue$
+    change$: update$.map(hue => ({h: hue}))
   };
 }

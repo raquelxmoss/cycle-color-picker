@@ -14,15 +14,17 @@ function view (state) {
         h1('.title', 'Cycle Color Picker'),
         h2('.intro-text', 'A color picker component for Cycle.js')
       ]),
-      div([state])
+      state
     ])
   );
 }
 
 function app ({DOM}) {
   const props$ = xs.of({color: '#C3209F'});
-  const colorPicker$ = ColorPicker({DOM, props$});
-  const state$ = colorPicker$.DOM;
+  const colorPicker = ColorPicker({DOM, props$});
+  // const color$ = colorPicker$.color$;
+
+  const state$ = colorPicker.DOM;
 
   return {
     DOM: state$.map(view)

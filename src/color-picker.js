@@ -1,20 +1,23 @@
 import xs from 'xstream';
 import tinycolor from 'tinycolor2';
 import { div } from '@cycle/dom';
+import css from 'stylin';
 
 import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
 import Alpha from './components/alpha';
 
+import { styles } from './styles/color-picker.js';
+
 function view ([saturationValue, hue, alpha, color]) {
   const swatch = div('.swatchy', {style: {
-    width: '100px',
-    height: '100px',
+    width: '20px',
+    height: '20px',
     background: tinycolor.fromRatio(color).toRgbString()
   }});
 
   return (
-    div('.color-picker', [
+    div(`.color-picker ${css.unimportant(styles)}`, [
       saturationValue,
       hue,
       alpha,
@@ -25,45 +28,35 @@ function view ([saturationValue, hue, alpha, color]) {
 
 function colorFromProps (props) {
   if ('color' in props) {
-    const color = tinycolor(props).toHsv();
+    const color = tinycolor(props.color).toHsv();
     color.h /= 360;
 
     return color;
   }
 }
 
-function calculateColor ([{saturation, value}, hue, alpha]) {
-  const color = {
-    h: hue,
-    s: saturation,
-    v: value,
-    a: alpha
-  };
-
-  return color;
-}
-
 export default function ColorPicker ({DOM, props$ = xs.empty()}) {
   const colorFromProps$ = props$.map(colorFromProps);
+  const colorChangeProxy$ = xs.create();
 
-  const colorProxy$ = xs.create();
+  const colorChange$ = xs.merge(
+    colorFromProps$,
+    colorChangeProxy$
+  );
 
-  const saturationValueComponent$ = SaturationValue({DOM, color$: xs.of('pink')});
-  const hueComponent$ = Hue({DOM, color$: xs.of('pink')});
-  const alphaComponent$ = Alpha({DOM, color$: xs.of('pink')});
+  const color$ = colorChange$.fold((color, change) => Object.assign({}, color, change), {h: 1, s: 1, v: 1, a: 1});
 
-  const saturationValue$ = saturationValueComponent$.saturationValue$;
-  const hue$ = hueComponent$.hue$;
-  const alpha$ = alphaComponent$.alpha$;
+  const saturationValueComponent$ = SaturationValue({DOM, color$});
+  const hueComponent$ = Hue({DOM, color$});
+  const alphaComponent$ = Alpha({DOM, color$});
 
-  const color$ = xs.combine(
-    saturationValue$,
-    hue$,
-    alpha$,
-    colorFromProps$
-  ).map(calculateColor);
+  const change$ = xs.merge(
+    saturationValueComponent$.change$,
+    hueComponent$.change$,
+    alphaComponent$.change$
+  );
 
-  // colorProxy$.imitate(color$);
+  colorChangeProxy$.imitate(change$);
 
   const vtree$ = xs.combine(
     saturationValueComponent$.DOM,
@@ -76,6 +69,6 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
 
   return {
     DOM: vtree$.map(view),
-    color$ : colorSink$
+    color$: colorSink$
   };
 }

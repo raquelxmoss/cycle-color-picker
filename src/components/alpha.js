@@ -7,6 +7,7 @@ import { between, containerBoundaries, getContainerWidth } from '../helpers';
 import { alphaStyle } from '../styles/alpha';
 
 function view ([props, alpha]) {
+  console.log(props, alpha)
   const container = getContainerWidth('.alpha-container');
 
   const alphaIndicatorStyle = {
@@ -33,7 +34,6 @@ function view ([props, alpha]) {
 
 function calculateAlpha (event) {
   const container = getContainerWidth('.alpha-container');
-
   const { containerWidth, left } = containerBoundaries('', event, container);
   const alpha = between(0, containerWidth, left) / containerWidth;
 
@@ -41,7 +41,7 @@ function calculateAlpha (event) {
 }
 
 function setAlphaFromProps (props) {
-  return tinycolor(props).toHsv().a;
+  return tinycolor.fromRatio(props).toHsv().a;
 }
 
 export default function Alpha ({DOM, color$}) {
@@ -65,21 +65,20 @@ export default function Alpha ({DOM, color$}) {
     .map(down => mouseMove$.endWhen(mouseUp$))
     .flatten();
 
-  const change$ = xs.merge(
+  const update$ = xs.merge(
     mouseDrag$,
     click$
   ).map(calculateAlpha);
 
-  const alphaFromProps$ = color$
-    .map(setAlphaFromProps);
+  const alphaFromProps$ = color$.map(setAlphaFromProps);
 
   const alpha$ = xs.merge(
-    change$,
-    alphaFromProps$
+    alphaFromProps$,
+    update$
   ).startWith(0);
 
   return {
     DOM: xs.combine(color$, alpha$).map(view),
-    alpha$
+    change$: update$.map(alpha => ({a: alpha}))
   };
 }

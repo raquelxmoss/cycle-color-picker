@@ -1,4 +1,3 @@
-import {saturation} from './saturation';
 import {controls} from './controls';
 import {inputs} from './inputs';
 
@@ -10,6 +9,5 @@ export const styles = {
   'box-shadow': 'rgba(0, 0, 0, 0.298039) 0px 0px 2px, rgba(0, 0, 0, 0.298039) 0px 4px 8px',
   'font-family': 'Helvetica, sans-serif',
   '.inputs-container': inputs,
-  '.controls-container': controls,
-  '.saturation': saturation
+  '.controls-container': controls
 };

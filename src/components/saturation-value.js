@@ -39,14 +39,14 @@ function calculateSaturationValue (event) {
     left
   } = containerBoundaries('', event, container);
 
-  const saturation = between(0, containerWidth, left) / containerWidth;
-  const value = 1 - (between(0, containerHeight, top) / containerHeight);
+  const s = between(0, containerWidth, left) / containerWidth;
+  const v = 1 - between(0, containerHeight, top) / containerHeight;
 
-  return { saturation, value };
+  return { s, v };
 }
 
 function setSaturationValueFromProps (props) {
-  const color = tinycolor(props).toHsv();
+  const color = tinycolor.fromRatio(props).toHsv();
 
   return { saturation: color.s, value: color.v };
 }
@@ -72,7 +72,7 @@ export default function SaturationValue ({DOM, color$}) {
     .map(down => mouseMove$.endWhen(mouseUp$))
     .flatten();
 
-  const change$ = xs.merge(
+  const update$ = xs.merge(
     mouseDrag$,
     click$
   ).map(calculateSaturationValue);
@@ -81,12 +81,12 @@ export default function SaturationValue ({DOM, color$}) {
     .map(setSaturationValueFromProps);
 
   const saturationValue$ = xs.merge(
-    change$,
+    update$,
     saturationValueFromProps$
-  ).startWith(0);
+  ).startWith({saturation: 0, value: 0});
 
   return {
     DOM: xs.combine(color$, saturationValue$).map(view),
-    saturationValue$
+    change$: update$
   };
 }
