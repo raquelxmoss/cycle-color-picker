@@ -1,17 +1,15 @@
 import xs from 'xstream';
+import dropRepeats from 'xstream/extra/dropRepeats';
 import { div } from '@cycle/dom';
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
 
-import { between, containerBoundaries, getContainerWidth } from '../helpers';
+import { between } from '../helpers';
 import { alphaStyle } from '../styles/alpha';
 
-function view ([props, alpha]) {
-  console.log(props, alpha)
-  const container = getContainerWidth('.alpha-container');
-
+function view ([props, alpha, dimensions]) {
   const alphaIndicatorStyle = {
-    left: `${container.width * alpha}px`
+    left: `${dimensions.width * alpha}px`
   };
 
   const color = tinycolor.fromRatio(props);
@@ -32,9 +30,10 @@ function view ([props, alpha]) {
   );
 }
 
-function calculateAlpha (event) {
-  const container = getContainerWidth('.alpha-container');
-  const { containerWidth, left } = containerBoundaries('', event, container);
+function calculateAlpha (event, dimensions) {
+  const containerWidth = dimensions.width;
+  const left = event.pageX - (dimensions.left + window.scrollX);
+
   const alpha = between(0, containerWidth, left) / containerWidth;
 
   return alpha;
@@ -47,6 +46,13 @@ function setAlphaFromProps (props) {
 export default function Alpha ({DOM, color$}) {
   const container$ = DOM
     .select('.alpha-container');
+
+  const dimensions$ = container$
+    .elements()
+    .filter(elements => elements.length > 0)
+    .map(el => el[0].getBoundingClientRect())
+    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
+    .startWith({width: 0, left: 0});
 
   const mouseMove$ = container$
     .events('mousemove');
@@ -65,20 +71,24 @@ export default function Alpha ({DOM, color$}) {
     .map(down => mouseMove$.endWhen(mouseUp$))
     .flatten();
 
-  const update$ = xs.merge(
+  const changeEvents$ = xs.merge(
     mouseDrag$,
     click$
-  ).map(calculateAlpha);
+  );
+
+  const calculatedAlpha$ = dimensions$
+    .map(dimensions => changeEvents$.map(event => calculateAlpha(event, dimensions)))
+    .flatten();
 
   const alphaFromProps$ = color$.map(setAlphaFromProps);
 
   const alpha$ = xs.merge(
     alphaFromProps$,
-    update$
+    calculatedAlpha$
   ).startWith(0);
 
   return {
-    DOM: xs.combine(color$, alpha$).map(view),
-    change$: update$.map(alpha => ({a: alpha}))
+    DOM: xs.combine(color$, alpha$, dimensions$).map(view),
+    change$: calculatedAlpha$.map(alpha => ({a: alpha}))
   };
 }

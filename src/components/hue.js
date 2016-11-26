@@ -1,4 +1,5 @@
 import xs from 'xstream';
+import dropRepeats from 'xstream/extra/dropRepeats';
 import { div } from '@cycle/dom';
 import css from 'stylin';
 import tinycolor from 'tinycolor2';
@@ -6,11 +7,9 @@ import tinycolor from 'tinycolor2';
 import { between, containerBoundaries, getContainerWidth } from '../helpers';
 import { hueStyle } from '../styles/hue';
 
-function view (hue) {
-  const container = getContainerWidth('.hue-container');
-
+function view ([props, hue, dimensions]) {
   const hueIndicatorStyle = {
-    left: `${container.width * hue}px`
+    left: `${dimensions.width * hue}px`
   };
 
   return (
@@ -22,10 +21,9 @@ function view (hue) {
   );
 }
 
-function calculateHue (event) {
-  const container = getContainerWidth('.hue-container');
-
-  const { containerWidth, left } = containerBoundaries('', event, container);
+function calculateHue (event, dimensions) {
+  const containerWidth = dimensions.width;
+  const left = event.pageX - (dimensions.left + window.scrollX);
 
   const hue = between(0, containerWidth, left) / containerWidth;
 
@@ -39,6 +37,13 @@ function setHueFromProps (props) {
 export default function Hue ({DOM, color$}) {
   const container$ = DOM
     .select('.hue-container');
+
+  const dimensions$ = container$
+    .elements()
+    .filter(elements => elements.length > 0)
+    .map(el => el[0].getBoundingClientRect())
+    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
+    .startWith({width: 0, left: 0});
 
   const mouseMove$ = container$
     .events('mousemove');
@@ -57,21 +62,24 @@ export default function Hue ({DOM, color$}) {
     .map(down => mouseMove$.endWhen(mouseUp$))
     .flatten();
 
-  const update$ = xs.merge(
+  const changeEvents$ = xs.merge(
     mouseDrag$,
     click$
-  ).map(calculateHue);
+  );
 
-  const hueFromProps$ = color$
-    .map(setHueFromProps);
+  const calculatedHue$ = dimensions$
+    .map(dimensions => changeEvents$.map(event => calculateHue(event, dimensions)))
+    .flatten();
+
+  const hueFromProps$ = color$.map(setHueFromProps);
 
   const hue$ = xs.merge(
-    update$,
-    hueFromProps$
+    hueFromProps$,
+    calculatedHue$
   ).startWith(0);
 
   return {
-    DOM: hue$.map(view),
-    change$: update$.map(hue => ({h: hue}))
+    DOM: xs.combine(color$, hue$, dimensions$).map(view),
+    change$: calculatedHue$.map(hue => ({h: hue}))
   };
 }

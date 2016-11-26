@@ -1,21 +1,21 @@
 import xs from 'xstream';
+import dropRepeats from 'xstream/extra/dropRepeats';
 import { div } from '@cycle/dom';
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
 
-import { between, containerBoundaries, getContainerWidth } from '../helpers';
+import { between } from '../helpers';
 import { saturationValueStyle } from '../styles/saturation-value';
 
-function view ([props, { saturation, value }]) {
-  const container = getContainerWidth('.saturation-value-container');
+function view ([props, { s, v }, dimensions]) {
   const propsColor = tinycolor.fromRatio(props).toHsv();
 
   const background = `hsl(${propsColor.h}, 100%, 50%)`;
-  const indicatorColor = value < 0.5 ? '#fff' : '#000';
+  const indicatorColor = v < 0.5 ? '#ffffff' : '#000000';
 
   const indicatorStyle = {
-    left: `${container.width * saturation}px`,
-    top: `${container.height * (1 - value)}px`,
+    left: `${dimensions.width * s}px`,
+    top: `${dimensions.height * (1 - v)}px`,
     'border-color': `${indicatorColor}`
   };
 
@@ -29,15 +29,11 @@ function view ([props, { saturation, value }]) {
   );
 }
 
-function calculateSaturationValue (event) {
-  const container = getContainerWidth('.saturation-value-container');
-
-  const {
-    containerWidth,
-    containerHeight,
-    top,
-    left
-  } = containerBoundaries('', event, container);
+function calculateSaturationValue (event, dimensions) {
+  const containerWidth = dimensions.width;
+  const containerHeight = dimensions.height;
+  const left = event.pageX - (dimensions.left + window.scrollX);
+  const top = event.pageY - (dimensions.top + window.scrollY);
 
   const s = between(0, containerWidth, left) / containerWidth;
   const v = 1 - between(0, containerHeight, top) / containerHeight;
@@ -48,12 +44,19 @@ function calculateSaturationValue (event) {
 function setSaturationValueFromProps (props) {
   const color = tinycolor.fromRatio(props).toHsv();
 
-  return { saturation: color.s, value: color.v };
+  return { s: color.s, v: color.v };
 }
 
 export default function SaturationValue ({DOM, color$}) {
   const container$ = DOM
     .select('.saturation-value-container');
+
+  const dimensions$ = container$
+    .elements()
+    .filter(elements => elements.length > 0)
+    .map(el => el[0].getBoundingClientRect())
+    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
+    .startWith({width: 0, height: 0, top: 0, left: 0});
 
   const mouseMove$ = container$
     .events('mousemove');
@@ -72,10 +75,14 @@ export default function SaturationValue ({DOM, color$}) {
     .map(down => mouseMove$.endWhen(mouseUp$))
     .flatten();
 
-  const update$ = xs.merge(
+  const changeEvents$ = xs.merge(
     mouseDrag$,
     click$
-  ).map(calculateSaturationValue);
+  );
+
+  const update$ = dimensions$
+    .map(dimensions => changeEvents$.map(event => calculateSaturationValue(event, dimensions)))
+    .flatten();
 
   const saturationValueFromProps$ = color$
     .map(setSaturationValueFromProps);
@@ -83,10 +90,10 @@ export default function SaturationValue ({DOM, color$}) {
   const saturationValue$ = xs.merge(
     update$,
     saturationValueFromProps$
-  ).startWith({saturation: 0, value: 0});
+  ).startWith({s: 0, v: 0});
 
   return {
-    DOM: xs.combine(color$, saturationValue$).map(view),
+    DOM: xs.combine(color$, saturationValue$, dimensions$).map(view),
     change$: update$
   };
 }
