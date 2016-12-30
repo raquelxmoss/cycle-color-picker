@@ -6,10 +6,11 @@ import css from 'stylin';
 import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
 import Alpha from './components/alpha';
+import TextInput from './components/text-input';
 
 import { styles } from './styles/color-picker.js';
 
-function view ([saturationValue, hue, alpha, color]) {
+function view ([saturationValue, hue, alpha, hex, color]) {
   const swatch = div('.swatchy', {style: {
     width: '20px',
     height: '20px',
@@ -21,6 +22,7 @@ function view ([saturationValue, hue, alpha, color]) {
       saturationValue,
       hue,
       alpha,
+      hex,
       swatch
     ])
   );
@@ -49,11 +51,13 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
   const saturationValueComponent$ = SaturationValue({DOM, color$});
   const hueComponent$ = Hue({DOM, color$});
   const alphaComponent$ = Alpha({DOM, color$});
+  const hexComponent$ = TextInput({DOM, color$});
 
   const change$ = xs.merge(
     saturationValueComponent$.change$,
     hueComponent$.change$,
-    alphaComponent$.change$
+    alphaComponent$.change$,
+    hexComponent$.change$
   );
 
   colorChangeProxy$.imitate(change$);
@@ -62,6 +66,7 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
     saturationValueComponent$.DOM,
     hueComponent$.DOM,
     alphaComponent$.DOM,
+    hexComponent$.DOM,
     color$
   );
 
