@@ -5,6 +5,7 @@
 // also you can cycle through the inputs, but that doesn't affect the outside world, that's internal state
 //
 // Props: color, format
+//
 
 import xs from 'xstream';
 import debounce from 'xstream/extra/debounce';
@@ -37,7 +38,7 @@ export default function TextInput ({DOM, color$}) {
   const hex$ = xs.merge(
     hexFromProps$,
     hexFromInput$
-  ).startWith('#FFFFFF').debug();
+  ).startWith('#FFFFFF')
 
   return {
     DOM: hex$.map(view),

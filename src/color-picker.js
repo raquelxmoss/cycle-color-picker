@@ -1,4 +1,5 @@
 import xs from 'xstream';
+import dropRepeats from 'xstream/extra/dropRepeats';
 import tinycolor from 'tinycolor2';
 import { div } from '@cycle/dom';
 import css from 'stylin';
@@ -68,7 +69,7 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
     alphaComponent$.DOM,
     hexComponent$.DOM,
     color$
-  );
+  ).compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)));
 
   const colorSink$ = color$.map(color => tinycolor.fromRatio(color).toRgbString());
 

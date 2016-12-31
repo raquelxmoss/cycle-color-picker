@@ -10,10 +10,6 @@ const drivers = {
 function view (state) {
   return (
     div('.app-container', [
-      div('.intro', [
-        h1('.title', 'Cycle Color Picker'),
-        h2('.intro-text', 'A color picker component for Cycle.js')
-      ]),
       state
     ])
   );
