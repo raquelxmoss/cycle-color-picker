@@ -8,8 +8,8 @@
   ],
   "scripts": {
     "start": "babel-node server.js",
-    "test": "mocha --compilers js:babel-core/register",
-    "autotest": "mocha --compilers js:babel-core/register --watch -R min",
+    "test": "mocha --compilers js:babel-core/register --recursive",
+    "autotest": "mocha --compilers js:babel-core/register --watch -R min --recursive",
     "bundle": "browserify index.js -t babelify -t uglifyify -o bundle.js",
     "precompile-lib": "rm -rf lib/ && mkdir -p lib",
     "compile-lib": "babel src -d lib",
