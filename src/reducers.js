@@ -144,21 +144,7 @@ function setStateFromInput ({channel, value}) {
   };
 }
 
-function changeColorInputFormat () {
-  return function _changeColorInputFormat (state) {
-    const inputFormats = ['rgba', 'hex', 'hsla'];
-    const currentInput = inputFormats.indexOf(state.colorInputFormat.value);
-    const newInput = ((currentInput + 1) % inputFormats.length + inputFormats.length) % inputFormats.length;
 
-    const newFormat = inputFormats[newInput];
-
-    return Object.assign(
-      {},
-      state,
-      {colorInputFormat: state.colorInputFormat.set(newFormat)}
-    );
-  };
-}
 
 export default function makeReducer$ ({DOM, props$}) {
   const mouseUp$ = DOM
@@ -172,11 +158,6 @@ export default function makeReducer$ ({DOM, props$}) {
     .compose(debounce(300))
     .filter(ev => tinycolor(ev.target.value).isValid())
     .map(ev => setStateFromInput({value: ev.target.value}));
-
-  const inputSwitcher$ = DOM
-    .select('.switcher')
-    .events('click')
-    .map(changeColorInputFormat);
 
   const setStateFromProps$ = props$
     .map(setStateFromProps);

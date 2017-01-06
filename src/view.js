@@ -5,69 +5,6 @@ import {div, input, span, p} from '@cycle/dom';
 
 import {isInt} from './helpers';
 import {styles} from './styles/color-picker';
-import downArrow from './icons/arrow-down.svg';
-import upArrow from './icons/arrow-up.svg';
-
-const colorInputViews = {
-  hex: (color) => renderHexInputElement(color.toHexString()),
-  rgba: (color) => renderColorInputElement(color.toRgb()),
-  hsla: (color) => renderColorInputElement(color.toHsl())
-};
-
-function makeInputElement (inputType, color, channel) {
-  const value = isInt(color[channel]) ? color[channel] : color[channel].toFixed(2);
-
-  return (
-    input(
-      `.${inputType}-input .color-input`,
-      {
-        props: {
-          value,
-          'data-channel': channel
-        }
-      }
-    )
-  );
-}
-
-function renderColorInputElement (color) {
-  const inputType = Object.keys(color).join('');
-
-  return (
-      div('.color-input-container',
-      _.map(color, (value, channel) => {
-        return div('.channel-container', [
-          makeInputElement(inputType, color, channel),
-          span(channel)
-        ]);
-      })
-    )
-  );
-}
-
-function renderHexInputElement (color) {
-  return input('.hex-input', {props: {type: 'text', value: color}});
-}
-
-function renderColorInputs (state) {
-  const format = state.colorInputFormat.value;
-  const color = tinycolor.fromRatio(state.color);
-
-  return div('.color-display', [
-    colorInputViews[format](color)
-  ]);
-}
-
-function renderInputSwitcher (state) {
-  return (
-    div('.input-switcher', [
-      p('.switcher .up', [upArrow]),
-      p('.switcher .down', [downArrow])
-    ])
-  );
-}
-
-
 
 function renderSwatch (state) {
   const color = tinycolor.fromRatio(state.color);

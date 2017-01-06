@@ -9,15 +9,34 @@
 import xs from 'xstream';
 import debounce from 'xstream/extra/debounce';
 import tinycolor from 'tinycolor2';
-import { input, div, span } from '@cycle/dom';
+import { input, div, span, p } from '@cycle/dom';
 
 import { isInt } from '../helpers';
+import downArrow from '../icons/arrow-down.svg';
+import upArrow from '../icons/arrow-up.svg';
 
 const colorInputViews = {
   hex: (color) => hexView(color.toHexString()),
   rgba: (color) => colorInputView(color.toRgb()),
   hsla: (color) => colorInputView(color.toHsl())
 };
+
+function renderInputSwitcher () {
+  return (
+    div('.input-switcher', [
+      p('.switcher .up', [upArrow]),
+      p('.switcher .down', [downArrow])
+    ])
+  );
+}
+
+function changeColorInputFormat (current, change) {
+  const inputFormats = ['rgba', 'hex', 'hsla'];
+  const currentInput = inputFormats.indexOf(current);
+  const newInput = ((currentInput + 1) % inputFormats.length + inputFormats.length) % inputFormats.length;
+
+  return inputFormats[newInput];
+}
 
 function makeInputElement (inputType, color, channel) {
   const value = isInt(color[channel]) ? color[channel] : color[channel].toFixed(2);
@@ -55,11 +74,10 @@ function hexView (color) {
   return input('.hex-input', {props: {type: 'text', value: color}});
 }
 
-function view (color) {
-  const format = 'hsla'; // either hex, rgba, hsla
-
+function view ([color, format]) {
   return div('.color-display', [
-    colorInputViews[format](tinycolor(color))
+    colorInputViews[format](tinycolor(color)),
+    renderInputSwitcher()
   ]);
 }
 
@@ -87,8 +105,13 @@ export default function TextInput ({DOM, color$}) {
     colorFromInput$
   ).startWith('#FFFFFF');
 
+  const format$ = DOM
+    .select('.switcher')
+    .events('click')
+    .fold(changeColorInputFormat, 'hex');
+
   return {
-    DOM: colorChange$.map(view),
+    DOM: xs.combine(colorChange$, format$).map(view),
     change$: colorFromInput$.map(color => tinycolor(color).toHsv())
   };
 }
