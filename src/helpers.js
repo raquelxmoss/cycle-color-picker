@@ -27,26 +27,6 @@ export function either (values, currentValue) {
   };
 }
 
-export function getColorFromHex (hex) {
-  const color = tinycolor(hex).toHsv();
-
-  return color;
-}
-
-export function getColorFromRGBA (state, channel, value) {
-  const color = tinycolor.fromRatio(state.color).toRgb();
-  color[channel] = value;
-
-  return color;
-}
-
-export function getColorFromHSLA (state, channel, value) {
-  const color = tinycolor.fromRatio(state.color).toHsl();
-  color[channel] = value;
-
-  return color;
-}
-
 export function isInt (n) {
   return n % 1 === 0;
 }

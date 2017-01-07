@@ -4,8 +4,10 @@ import dropRepeats from 'xstream/extra/dropRepeats';
 import tinycolor from 'tinycolor2';
 import { input, div, span, p } from '@cycle/dom';
 import _ from 'lodash';
+import css from 'stylin';
 
 import { isInt } from '../helpers';
+import { inputs } from '../styles/inputs';
 import downArrow from '../icons/arrow-down.svg';
 import upArrow from '../icons/arrow-up.svg';
 
@@ -37,7 +39,7 @@ function makeInputElement (inputType, color, channel) {
 
   return (
     input(
-      `.${inputType.join('')}-input .text-input`,
+      `.${inputType.join('')}-input .text-input .color-input`,
       {
         props: { value: value },
         attrs: {
@@ -52,7 +54,7 @@ function colorInputView (color) {
   const inputType = Object.keys(color);
 
   return (
-      div('.color-input-container',
+      div(`.color-input-container`,
         inputType.map((channel) => {
           return div('.channel-container', [
             makeInputElement(inputType, color, channel),
@@ -66,7 +68,7 @@ function colorInputView (color) {
 
 function hexView (color) {
   return input(
-    '.text-input',
+    '.text-input .hex-input',
     {
       props: {
         value: color
@@ -79,7 +81,7 @@ function hexView (color) {
 }
 
 function view ([color, format]) {
-  return div('.color-display', [
+  return div(`.color-display ${css.unimportant(inputs)}`, [
     colorInputViews[format](tinycolor(color)),
     renderInputSwitcher()
   ]);
@@ -126,6 +128,7 @@ export default function TextInput ({DOM, color$}) {
 
   const input$ = xs.combine(inputChannels$, inputValue$);
 
+  // TODO: add logic for when it should/shouldn't switch
   const format$ = DOM
     .select('.switcher')
     .events('click')
