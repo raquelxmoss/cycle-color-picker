@@ -1,15 +1,9 @@
-// takes in a color and a format
-// listens to input
-// converts it into a color
-// sends it back up to the parent
-// also you can cycle through the inputs, but that doesn't affect the outside world, that's internal state
-//
-// Props: color, format
-
 import xs from 'xstream';
 import debounce from 'xstream/extra/debounce';
+import dropRepeats from 'xstream/extra/dropRepeats';
 import tinycolor from 'tinycolor2';
 import { input, div, span, p } from '@cycle/dom';
+import _ from 'lodash';
 
 import { isInt } from '../helpers';
 import downArrow from '../icons/arrow-down.svg';
@@ -43,10 +37,10 @@ function makeInputElement (inputType, color, channel) {
 
   return (
     input(
-      `.${inputType}-input .text-input`,
+      `.${inputType.join('')}-input .text-input`,
       {
-        props: {
-          value,
+        props: { value: value },
+        attrs: {
           'data-channel': channel
         }
       }
@@ -71,7 +65,17 @@ function colorInputView (color) {
 }
 
 function hexView (color) {
-  return input('.hex-input', {props: {type: 'text', value: color}});
+  return input(
+    '.text-input',
+    {
+      props: {
+        value: color
+      },
+      attrs: {
+        'data-channel': 'hex'
+      }
+    }
+  );
 }
 
 function view ([color, format]) {
@@ -81,34 +85,60 @@ function view ([color, format]) {
   ]);
 }
 
-function colorFromInput (colorString) {
-  const color = tinycolor(colorString);
+// TODO: make this better, this is awful
+function colorFromInput ([input, format]) {
+  const [old, change] = input;
+  let color;
 
-  if (!color.isValid()) { return; }
+  if (format === 'hex') {
+    color = change.value;
+  } else {
+    const indexToChange = _.findIndex(old, function (o) { return o.channel === change.channel; });
 
-  return color.toHexString();
+    old[indexToChange] = change;
+
+    color = old.reduce((newColor, {channel, value}) => Object.assign(newColor, {[`${channel}`]: value}), {});
+  }
+
+  const colorFromInput = tinycolor(color);
+
+  if (!colorFromInput.isValid()) { return; }
+
+  return colorFromInput.toHsv();
+}
+
+function structureElement (element) {
+  return { value: element.value, channel: element.getAttribute('data-channel') };
 }
 
 export default function TextInput ({DOM, color$}) {
-  const input$ = DOM
-    .select('.color-input-container input')
+  const inputChannels$ = DOM
+    .select('.text-input')
+    .elements()
+    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
+    .map(elements => elements.map(structureElement));
+
+  const inputValue$ = DOM
+    .select('.text-input')
     .events('input')
     .compose(debounce(300))
-    .map(ev => ev.target.value);
+    .map(event => structureElement(event.target));
 
-  const colorFromProps$ = color$.map(color => tinycolor.fromRatio(color).toHexString());
-
-  const colorFromInput$ = input$.map(colorFromInput);
-
-  const colorChange$ = xs.merge(
-    colorFromProps$,
-    colorFromInput$
-  ).startWith('#FFFFFF');
+  const input$ = xs.combine(inputChannels$, inputValue$);
 
   const format$ = DOM
     .select('.switcher')
     .events('click')
     .fold(changeColorInputFormat, 'hex');
+
+  const colorFromProps$ = color$.map(color => tinycolor.fromRatio(color).toHsv());
+
+  const colorFromInput$ = xs.combine(input$, format$).map(colorFromInput);
+
+  const colorChange$ = xs.merge(
+    colorFromProps$,
+    colorFromInput$
+  ).startWith('#FFFFFF');
 
   return {
     DOM: xs.combine(colorChange$, format$).map(view),
