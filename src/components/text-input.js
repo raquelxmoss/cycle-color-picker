@@ -1,6 +1,7 @@
 import xs from 'xstream';
 import debounce from 'xstream/extra/debounce';
 import dropRepeats from 'xstream/extra/dropRepeats';
+import sampleCombine from 'xstream/extra/sampleCombine';
 import tinycolor from 'tinycolor2';
 import { input, div, span, p } from '@cycle/dom';
 import _ from 'lodash';
@@ -54,7 +55,7 @@ function colorInputView (color) {
   const inputType = Object.keys(color);
 
   return (
-      div(`.color-input-container`,
+      div('.color-input-container',
         inputType.map((channel) => {
           return div('.channel-container', [
             makeInputElement(inputType, color, channel),
@@ -87,13 +88,12 @@ function view ([color, format]) {
   ]);
 }
 
-// TODO: make this better, this is awful
 function colorFromInput ([input, format]) {
   const [old, change] = input;
-  let color;
+  var color;
 
   if (format === 'hex') {
-    color = change.value;
+    color = old[0].value;
   } else {
     const indexToChange = _.findIndex(old, function (o) { return o.channel === change.channel; });
 
@@ -113,11 +113,17 @@ function structureElement (element) {
   return { value: element.value, channel: element.getAttribute('data-channel') };
 }
 
+function dropElRepeats (a, b) {
+  if (b[0] === undefined) { return false; }
+
+  return a[0] === b[0];
+}
+
 export default function TextInput ({DOM, color$}) {
   const inputChannels$ = DOM
     .select('.text-input')
     .elements()
-    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
+    .compose(dropRepeats((a, b) => dropElRepeats(a, b)))
     .map(elements => elements.map(structureElement));
 
   const inputValue$ = DOM
@@ -128,20 +134,20 @@ export default function TextInput ({DOM, color$}) {
 
   const input$ = xs.combine(inputChannels$, inputValue$);
 
-  // TODO: add logic for when it should/shouldn't switch
   const format$ = DOM
     .select('.switcher')
     .events('click')
     .fold(changeColorInputFormat, 'hex');
 
+  // when the format changes, recalculate the color
   const colorFromProps$ = color$.map(color => tinycolor.fromRatio(color).toHsv());
 
-  const colorFromInput$ = xs.combine(input$, format$).map(colorFromInput);
+  const colorFromInput$ = input$
+    .compose(sampleCombine(format$))
+    .map(colorFromInput);
 
-  const colorChange$ = xs.merge(
-    colorFromProps$,
-    colorFromInput$
-  ).startWith('#FFFFFF');
+  const colorChange$ = xs.merge(colorFromProps$, colorFromInput$)
+    .startWith({h: 1, s: 1, v: 1, a: 1});
 
   return {
     DOM: xs.combine(colorChange$, format$).map(view),
