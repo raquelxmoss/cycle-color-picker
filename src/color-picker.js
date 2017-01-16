@@ -16,16 +16,14 @@ function view ([saturationValue, hue, alpha, text, swatch, color]) {
   return (
     div(`.color-picker ${css.unimportant(styles)}`, [
       saturationValue,
-      div(`.controls-container`, [
+      div('.controls-container', [
         swatch,
         div('.sliders', [
           hue,
-          alpha,
+          alpha
         ])
       ]),
-      div([
-        text
-      ])
+      text
     ])
   );
 }

@@ -45,7 +45,8 @@ export default function Hue ({DOM, color$}) {
     .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
     .startWith({width: 0, left: 0});
 
-  const mouseMove$ = container$
+  const mouseMove$ = DOM
+    .select('document')
     .events('mousemove');
 
   const mouseDown$ = container$
