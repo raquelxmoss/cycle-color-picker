@@ -8,22 +8,17 @@ import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
 import Alpha from './components/alpha';
 import TextInput from './components/text-input';
+import Swatch from './components/swatch';
 
 import { styles } from './styles/color-picker.js';
 
-function view ([saturationValue, hue, alpha, hex, color]) {
-  const swatch = div('.swatchy', {style: {
-    width: '20px',
-    height: '20px',
-    background: tinycolor.fromRatio(color).toRgbString()
-  }});
-
+function view ([saturationValue, hue, alpha, text, swatch, color]) {
   return (
     div(`.color-picker ${css.unimportant(styles)}`, [
       saturationValue,
       hue,
       alpha,
-      hex,
+      text,
       swatch
     ])
   );
@@ -52,13 +47,14 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
   const saturationValueComponent$ = SaturationValue({DOM, color$});
   const hueComponent$ = Hue({DOM, color$});
   const alphaComponent$ = Alpha({DOM, color$});
-  const hexComponent$ = TextInput({DOM, color$});
+  const textComponent$ = TextInput({DOM, color$});
+  const swatchComponent$ = Swatch({DOM, color$});
 
   const change$ = xs.merge(
     saturationValueComponent$.change$,
     hueComponent$.change$,
     alphaComponent$.change$,
-    hexComponent$.change$
+    textComponent$.change$
   );
 
   colorChangeProxy$.imitate(change$);
@@ -67,7 +63,8 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
     saturationValueComponent$.DOM,
     hueComponent$.DOM,
     alphaComponent$.DOM,
-    hexComponent$.DOM,
+    textComponent$.DOM,
+    swatchComponent$.DOM,
     color$
   ).compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)));
 

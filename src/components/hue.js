@@ -4,7 +4,7 @@ import { div } from '@cycle/dom';
 import css from 'stylin';
 import tinycolor from 'tinycolor2';
 
-import { between, containerBoundaries, getContainerWidth } from '../helpers';
+import { between } from '../helpers';
 import { hueStyle } from '../styles/hue';
 
 function view ([props, hue, dimensions]) {
