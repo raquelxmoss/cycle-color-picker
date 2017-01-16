@@ -1,11 +1,11 @@
 import xs from 'xstream';
-import dropRepeats from 'xstream/extra/dropRepeats';
 import { div } from '@cycle/dom';
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
 
 import { between } from '../helpers';
 import { saturationValueStyle } from '../styles/saturation-value';
+import intent from '../generators/intent';
 
 function view ([props, { s, v }, dimensions]) {
   const propsColor = tinycolor.fromRatio(props).toHsv();
@@ -48,37 +48,7 @@ function setSaturationValueFromProps (props) {
 }
 
 export default function SaturationValue ({DOM, color$}) {
-  const container$ = DOM
-    .select('.saturation-value-container');
-
-  const dimensions$ = container$
-    .elements()
-    .filter(elements => elements.length > 0)
-    .map(el => el[0].getBoundingClientRect())
-    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
-    .startWith({width: 0, height: 0, top: 0, left: 0});
-
-  const mouseMove$ = container$
-    .events('mousemove');
-
-  const mouseDown$ = container$
-    .events('mousedown');
-
-  const mouseUp$ = DOM
-    .select('document')
-    .events('mouseup');
-
-  const click$ = container$
-    .events('click');
-
-  const mouseDrag$ = mouseDown$
-    .map(down => mouseMove$.endWhen(mouseUp$))
-    .flatten();
-
-  const changeEvents$ = xs.merge(
-    mouseDrag$,
-    click$
-  );
+  const { dimensions$, changeEvents$ } = intent({DOM, selector: '.saturation-value-container'});
 
   const update$ = dimensions$
     .map(dimensions => changeEvents$.map(event => calculateSaturationValue(event, dimensions)))

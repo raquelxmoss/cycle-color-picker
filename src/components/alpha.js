@@ -1,11 +1,11 @@
 import xs from 'xstream';
-import dropRepeats from 'xstream/extra/dropRepeats';
 import { div } from '@cycle/dom';
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
 
 import { between } from '../helpers';
 import { alphaStyle } from '../styles/alpha';
+import intent from '../generators/intent';
 
 function view ([props, alpha, dimensions]) {
   const alphaIndicatorStyle = {
@@ -44,38 +44,7 @@ function setAlphaFromProps (props) {
 }
 
 export default function Alpha ({DOM, color$}) {
-  const container$ = DOM
-    .select('.alpha-container');
-
-  const dimensions$ = container$
-    .elements()
-    .filter(elements => elements.length > 0)
-    .map(el => el[0].getBoundingClientRect())
-    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
-    .startWith({width: 0, left: 0});
-
-  const mouseMove$ = DOM
-    .select('document')
-    .events('mousemove');
-
-  const mouseDown$ = container$
-    .events('mousedown');
-
-  const mouseUp$ = DOM
-    .select('document')
-    .events('mouseup');
-
-  const click$ = container$
-    .events('click');
-
-  const mouseDrag$ = mouseDown$
-    .map(down => mouseMove$.endWhen(mouseUp$))
-    .flatten();
-
-  const changeEvents$ = xs.merge(
-    mouseDrag$,
-    click$
-  );
+  const { dimensions$, changeEvents$ } = intent({DOM, selector: '.alpha-container'});
 
   const calculatedAlpha$ = dimensions$
     .map(dimensions => changeEvents$.map(event => calculateAlpha(event, dimensions)))
