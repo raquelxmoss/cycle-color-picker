@@ -1,6 +1,10 @@
 import xs from 'xstream';
 import dropRepeats from 'xstream/extra/dropRepeats';
 
+function dropContainerRepeats (a, b) {
+  return a.top === b.top && a.height === b.height && a.left === b.left && a.width === b.width;
+}
+
 export default function intent ({DOM, selector}) {
   const container$ = DOM
     .select(selector);
@@ -9,7 +13,7 @@ export default function intent ({DOM, selector}) {
     .elements()
     .filter(elements => elements.length > 0)
     .map(el => el[0].getBoundingClientRect())
-    .compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)))
+    .compose(dropRepeats((a, b) => dropContainerRepeats(a, b)))
     .startWith({width: 0, left: 0});
 
   const mouseMove$ = DOM
