@@ -38,6 +38,7 @@
   "homepage": "https://github.com/raquelxmoss/cycle-color-picker",
   "dependencies": {
     "@cycle/dom": "^12.1.0",
+    "cycle-onionify": "^2.4.0",
     "stylin": "^4.2.0",
     "tinycolor2": "^1.3.0",
     "xs-combine-obj": "^1.1.1",

@@ -3,6 +3,7 @@ import dropRepeats from 'xstream/extra/dropRepeats';
 import tinycolor from 'tinycolor2';
 import { div } from '@cycle/dom';
 import css from 'stylin';
+import onionify from 'cycle-onionify';
 
 import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
@@ -31,23 +32,21 @@ function view ([saturationValue, hue, alpha, text, swatch, color]) {
 function colorFromProps (props) {
   if ('color' in props) {
     const color = tinycolor(props.color).toHsv();
+    // do I do the from ratio thing here?
     color.h /= 360;
 
     return color;
   }
 }
 
-export default function ColorPicker ({DOM, props$ = xs.empty()}) {
+function ColorPicker ({DOM, onion, props$ = xs.empty()}) {
+  const state$ = onion.state$
+  const initialState$ = xs.of(() => props$.map(colorFromProps));
+  const reducer$ = // all the child reducers;
+
   const colorFromProps$ = props$.map(colorFromProps);
-  const colorChangeProxy$ = xs.create();
 
-  const colorChange$ = xs.merge(
-    colorFromProps$,
-    colorChangeProxy$
-  );
-
-  const color$ = colorChange$.fold((color, change) => Object.assign({}, color, change), {h: 1, s: 1, v: 1, a: 1});
-
+// const state$ =
   const saturationValueComponent$ = SaturationValue({DOM, color$});
   const hueComponent$ = Hue({DOM, color$});
   const alphaComponent$ = Alpha({DOM, color$});
@@ -60,8 +59,6 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
     alphaComponent$.change$,
     textComponent$.change$
   );
-
-  colorChangeProxy$.imitate(change$);
 
   const vtree$ = xs.combine(
     saturationValueComponent$.DOM,
@@ -79,3 +76,5 @@ export default function ColorPicker ({DOM, props$ = xs.empty()}) {
     color$: colorSink$
   };
 }
+
+export default onionify(ColorPicker);
