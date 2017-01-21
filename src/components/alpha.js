@@ -1,5 +1,6 @@
 import xs from 'xstream';
 import { div } from '@cycle/dom';
+import onionify from 'cycle-onionify';
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
 
@@ -31,34 +32,42 @@ function view ([props, alpha, dimensions]) {
 }
 
 function calculateAlpha (event, dimensions) {
-  const containerWidth = dimensions.width;
-  const left = event.pageX - (dimensions.left + window.scrollX);
+  return function _calculateAlpha () {
+    const containerWidth = dimensions.width;
+    const left = event.pageX - (dimensions.left + window.scrollX);
 
-  const alpha = between(0, containerWidth, left) / containerWidth;
+    const alpha = between(0, containerWidth, left) / containerWidth;
 
-  return alpha;
+    return alpha;
+  };
 }
 
 function setAlphaFromProps (props) {
   return tinycolor.fromRatio(props).toHsv().a;
 }
 
-export default function Alpha ({DOM, color$}) {
+// hi, I am a reducer. I take in state and return state.
+
+function Alpha ({DOM, onion, color$}) {
+  const initialState$ = color$.map(setAlphaFromProps);
+  const alpha$ = onion.state$;
+
   const { dimensions$, changeEvents$ } = intent({DOM, selector: '.alpha-container'});
 
   const calculatedAlpha$ = dimensions$
     .map(dimensions => changeEvents$.map(event => calculateAlpha(event, dimensions)))
     .flatten();
 
-  const alphaFromProps$ = color$.map(setAlphaFromProps);
-
-  const alpha$ = xs.merge(
-    alphaFromProps$,
+  const reducer$ = xs.merge(
+    // initialState$,
     calculatedAlpha$
-  ).startWith(0);
+  );
 
   return {
     DOM: xs.combine(color$, alpha$, dimensions$).map(view),
-    change$: calculatedAlpha$.map(alpha => ({a: alpha}))
+    change$: calculatedAlpha$.map(alpha => ({a: alpha})),
+    onion: reducer$
   };
 }
+
+export default onionify(Alpha);

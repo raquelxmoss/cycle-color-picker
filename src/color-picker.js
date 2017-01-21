@@ -4,6 +4,7 @@ import tinycolor from 'tinycolor2';
 import { div } from '@cycle/dom';
 import css from 'stylin';
 import onionify from 'cycle-onionify';
+import isolate from '@cycle/isolate';
 
 import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
@@ -32,48 +33,50 @@ function view ([saturationValue, hue, alpha, text, swatch, color]) {
 function colorFromProps (props) {
   if ('color' in props) {
     const color = tinycolor(props.color).toHsv();
-    // do I do the from ratio thing here?
     color.h /= 360;
 
     return color;
   }
 }
 
+function initialReducer (state) {
+  return {h: 1, s: 1, v: 1, a: 1};
+}
+
 function ColorPicker ({DOM, onion, props$ = xs.empty()}) {
-  const state$ = onion.state$
-  const initialState$ = xs.of(() => props$.map(colorFromProps));
-  const reducer$ = // all the child reducers;
+  const initialState$ = xs.of(initialReducer);
+  const color$ = onion.state$.debug()
 
-  const colorFromProps$ = props$.map(colorFromProps);
-
-// const state$ =
-  const saturationValueComponent$ = SaturationValue({DOM, color$});
-  const hueComponent$ = Hue({DOM, color$});
-  const alphaComponent$ = Alpha({DOM, color$});
-  const textComponent$ = TextInput({DOM, color$});
-  const swatchComponent$ = Swatch({DOM, color$});
-
-  const change$ = xs.merge(
-    saturationValueComponent$.change$,
-    hueComponent$.change$,
-    alphaComponent$.change$,
-    textComponent$.change$
-  );
+  const saturationValueComponent = isolate(SaturationValue, 'saturationValue')({DOM, color$});
+  const hueComponent = isolate(Hue, 'hue')({DOM, color$});
+  const alphaComponent = isolate(Alpha, 'alpha')({DOM, color$});
+  const textComponent = isolate(TextInput, 'textInput')({DOM, color$});
+  const swatchComponent = isolate(Swatch, 'swatch')({DOM, color$});
 
   const vtree$ = xs.combine(
-    saturationValueComponent$.DOM,
-    hueComponent$.DOM,
-    alphaComponent$.DOM,
-    textComponent$.DOM,
-    swatchComponent$.DOM,
+    saturationValueComponent.DOM,
+    hueComponent.DOM,
+    alphaComponent.DOM,
+    // textComponent.DOM,
+    // swatchComponent.DOM,
     color$
   ).compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)));
+
+  const reducer$ = xs.merge(
+    initialState$,
+    saturationValueComponent.onion,
+    hueComponent.onion,
+    alphaComponent.onion
+    // textComponent.onion,
+    // swatchComponent.onion
+  );
 
   const colorSink$ = color$.map(color => tinycolor.fromRatio(color).toRgbString());
 
   return {
     DOM: vtree$.map(view),
-    color$: colorSink$
+    color$: colorSink$,
+    onion: reducer$
   };
 }
 
