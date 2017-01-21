@@ -1,8 +1,5 @@
 import xs from 'xstream';
-import sampleCombine from 'xstream/extra/sampleCombine';
-
 import { div } from '@cycle/dom';
-import onionify from 'cycle-onionify';
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
 
@@ -33,43 +30,40 @@ function view ([props, { s, v }, dimensions]) {
 }
 
 function calculateSaturationValue (event, dimensions) {
-  return function _calculateSaturationValue () {
-    const containerWidth = dimensions.width;
-    const containerHeight = dimensions.height;
-    const left = event.pageX - (dimensions.left + window.scrollX);
-    const top = event.pageY - (dimensions.top + window.scrollY);
+  const containerWidth = dimensions.width;
+  const containerHeight = dimensions.height;
+  const left = event.pageX - (dimensions.left + window.scrollX);
+  const top = event.pageY - (dimensions.top + window.scrollY);
 
-    const s = between(0, containerWidth, left) / containerWidth;
-    const v = 1 - between(0, containerHeight, top) / containerHeight;
+  const s = between(0, containerWidth, left) / containerWidth;
+  const v = 1 - between(0, containerHeight, top) / containerHeight;
 
-    return { s, v };
-  };
+  return { s, v };
 }
 
 function setSaturationValueFromProps (props) {
-  return function _setSaturationValueFromProps () {
-    const color = tinycolor.fromRatio(props).toHsv();
+  const color = tinycolor.fromRatio(props).toHsv();
 
-    return { s: color.s, v: color.v };
-  };
+  return { s: color.s, v: color.v };
 }
 
-function SaturationValue ({DOM, onion, color$}) {
-  const initialReducer$ = color$.map(color => setSaturationValueFromProps(color));
-  const saturationValue$ = onion.state$.debug('satval');
-
+export default function SaturationValue ({DOM, color$}) {
   const { dimensions$, changeEvents$ } = intent({DOM, selector: '.saturation-value-container'});
 
-  const change$ = dimensions$
+  const update$ = dimensions$
     .map(dimensions => changeEvents$.map(event => calculateSaturationValue(event, dimensions)))
     .flatten();
 
-  const reducer$ = xs.merge(initialReducer$, change$);
+  const saturationValueFromProps$ = color$
+    .map(setSaturationValueFromProps);
+
+  const saturationValue$ = xs.merge(
+    update$,
+    saturationValueFromProps$
+  ).startWith({s: 0, v: 0});
 
   return {
     DOM: xs.combine(color$, saturationValue$, dimensions$).map(view),
-    onion: reducer$
+    change$: update$
   };
 }
-
-export default onionify(SaturationValue);

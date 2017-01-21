@@ -5,14 +5,11 @@ import isolate from '@cycle/isolate';
 import combineObj from 'xs-combine-obj';
 import ColorPicker from './src/color-picker';
 
-import SaturationValue from './src/components/saturation-value';
-
 const drivers = {
   DOM: makeDOMDriver('.app')
 };
 
-function view (state) {
-  console.log(state)
+function view ({colorPickerADOM, colorPickerBDOM, colorPickerAColor, colorPickerBColor}) {
   return (
     div('.app-container', [
       div('.intro', [
@@ -20,34 +17,31 @@ function view (state) {
         h2('.intro-text', 'A color picker component for Cycle.js')
       ]),
       div('.pickers', [
-        div('.left', [state])
+        div('.left', {style: {background: colorPickerAColor}}, [colorPickerADOM]),
+        div('.right', {style: {background: colorPickerBColor}}, [colorPickerBDOM])
       ])
     ])
   );
 }
 
-function app ({DOM}) {
-  const color$ = xs.of('#C3209F');
-  // const propsB$ = xs.of({color: '#542A93'});
+function app (sources) {
+  const propsA$ = xs.of({color: '#C3209F'});
+  const propsB$ = xs.of({color: '#542A93'});
 
-//   const ColorPickerA = isolate(ColorPicker);
-//   const colorPickerA = ColorPickerA({...sources, props$: propsA$});
-//   const ColorPickerB = isolate(ColorPicker);
-  // const colorPickerB = ColorPickerB({...sources, props$: propsB$});
+  const ColorPickerA = isolate(ColorPicker);
+  const colorPickerA = ColorPickerA({...sources, props$: propsA$});
+  const ColorPickerB = isolate(ColorPicker);
+  const colorPickerB = ColorPickerB({...sources, props$: propsB$});
 
-  // const state$ = combineObj({
-  //   colorPickerADOM: colorPickerA.DOM,
-  //   colorPickerBDOM: colorPickerB.DOM,
-  //   colorPickerAColor: colorPickerA.color$,
-  //   colorPickerBColor: colorPickerB.color$
-  // });
-
-  const saturationValue = SaturationValue({DOM, color$})
-
-  const state$ = saturationValue.onion.debug()
+  const state$ = combineObj({
+    colorPickerADOM: colorPickerA.DOM,
+    colorPickerBDOM: colorPickerB.DOM,
+    colorPickerAColor: colorPickerA.color$,
+    colorPickerBColor: colorPickerB.color$
+  });
 
   return {
-    DOM: saturationValue.DOM.map(view)
+    DOM: state$.map(view)
   };
 }
 

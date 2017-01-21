@@ -1,10 +1,8 @@
 import xs from 'xstream';
-import dropRepeats from 'xstream/extra/dropRepeats';
 import tinycolor from 'tinycolor2';
 import { div } from '@cycle/dom';
 import css from 'stylin';
 import onionify from 'cycle-onionify';
-import isolate from '@cycle/isolate';
 
 import SaturationValue from './components/saturation-value';
 import Hue from './components/hue';
@@ -14,7 +12,7 @@ import Swatch from './components/swatch';
 
 import { styles } from './styles/color-picker.js';
 
-function view ([saturationValue, hue, alpha, text, swatch, color]) {
+function view ([saturationValue, hue, alpha, text, swatch]) {
   return (
     div(`.color-picker ${css.unimportant(styles)}`, [
       saturationValue,
@@ -31,52 +29,59 @@ function view ([saturationValue, hue, alpha, text, swatch, color]) {
 }
 
 function colorFromProps (props) {
-  if ('color' in props) {
-    const color = tinycolor(props.color).toHsv();
-    color.h /= 360;
+  return function colorFromProps () {
+    if ('color' in props) {
+      const color = tinycolor(props.color).toHsv();
+      color.h /= 360;
 
-    return color;
-  }
+      return color;
+    }
+  };
 }
 
-function initialReducer (state) {
-  return {h: 1, s: 1, v: 1, a: 1};
+function composeColor (change) {
+  return function composeColor (state) {
+    return Object.assign({}, state, change);
+  };
 }
 
 function ColorPicker ({DOM, onion, props$ = xs.empty()}) {
-  const initialState$ = xs.of(initialReducer);
-  const color$ = onion.state$.debug()
+  const initialReducer$ = props$.map(props => colorFromProps(props));
+  const color$ = onion.state$.debug();
 
-  const saturationValueComponent = isolate(SaturationValue, 'saturationValue')({DOM, color$});
-  const hueComponent = isolate(Hue, 'hue')({DOM, color$});
-  const alphaComponent = isolate(Alpha, 'alpha')({DOM, color$});
-  const textComponent = isolate(TextInput, 'textInput')({DOM, color$});
-  const swatchComponent = isolate(Swatch, 'swatch')({DOM, color$});
+  const saturationValueComponent = SaturationValue({DOM, color$});
+  const hueComponent = Hue({DOM, color$});
+  const alphaComponent = Alpha({DOM, color$});
+  const textComponent = TextInput({DOM, color$});
+  const swatchComponent = Swatch({DOM, color$});
+
+  const composeColor$ = xs.merge(
+    saturationValueComponent.change$,
+    hueComponent.change$,
+    alphaComponent.change$,
+    textComponent.change$
+  ).map(composeColor);
 
   const vtree$ = xs.combine(
     saturationValueComponent.DOM,
     hueComponent.DOM,
     alphaComponent.DOM,
-    // textComponent.DOM,
-    // swatchComponent.DOM,
+    textComponent.DOM,
+    swatchComponent.DOM,
     color$
-  ).compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)));
+  );
 
   const reducer$ = xs.merge(
-    initialState$,
-    saturationValueComponent.onion,
-    hueComponent.onion,
-    alphaComponent.onion
-    // textComponent.onion,
-    // swatchComponent.onion
+    initialReducer$,
+    composeColor$
   );
 
   const colorSink$ = color$.map(color => tinycolor.fromRatio(color).toRgbString());
 
   return {
     DOM: vtree$.map(view),
-    color$: colorSink$,
-    onion: reducer$
+    onion: reducer$,
+    color$: colorSink$
   };
 }
 

@@ -1,6 +1,5 @@
 import xs from 'xstream';
 import { div } from '@cycle/dom';
-import onionify from 'cycle-onionify';
 import css from 'stylin';
 import tinycolor from 'tinycolor2';
 
@@ -23,39 +22,34 @@ function view ([props, hue, dimensions]) {
 }
 
 function calculateHue (event, dimensions) {
-  return function _calcuateHue () {
-    const containerWidth = dimensions.width;
-    const left = event.pageX - (dimensions.left + window.scrollX);
+  const containerWidth = dimensions.width;
+  const left = event.pageX - (dimensions.left + window.scrollX);
 
-    const hue = between(0, containerWidth, left) / containerWidth;
+  const hue = between(0, containerWidth, left) / containerWidth;
 
-    return hue;
-  };
+  return hue;
 }
 
-function setHueFromProps (props) {
-  return tinycolor.fromRatio(props).toHsv().h / 360;
+function setHueFromProps (color) {
+  return tinycolor.fromRatio(color).toHsv().h / 360;
 }
 
-function Hue ({DOM, onion, color$}) {
-  const hue$ = onion.state$;
-
+export default function Hue ({DOM, color$}) {
   const { dimensions$, changeEvents$ } = intent({DOM, selector: '.hue-container'});
 
   const calculatedHue$ = dimensions$
     .map(dimensions => changeEvents$.map(event => calculateHue(event, dimensions)))
     .flatten();
 
-  const reducer$ = xs.merge(
-    // initialState$,
+  const hueFromProps$ = color$.map(setHueFromProps);
+
+  const hue$ = xs.merge(
+    hueFromProps$,
     calculatedHue$
   );
 
   return {
     DOM: xs.combine(color$, hue$, dimensions$).map(view),
-    change$: calculatedHue$.map(hue => ({h: hue})),
-    onion: reducer$
+    change$: calculatedHue$.map(hue => ({h: hue}))
   };
 }
-
-export default onionify(Hue);
