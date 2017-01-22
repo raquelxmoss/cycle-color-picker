@@ -1,4 +1,5 @@
 import xs from 'xstream';
+import dropRepeats from 'xstream/extra/dropRepeats';
 import tinycolor from 'tinycolor2';
 import { div } from '@cycle/dom';
 import css from 'stylin';
@@ -47,7 +48,7 @@ function composeColor (change) {
 
 function ColorPicker ({DOM, onion, props$ = xs.empty()}) {
   const initialReducer$ = props$.map(props => colorFromProps(props));
-  const color$ = onion.state$.debug();
+  const color$ = onion.state$.debug('the color is now');
 
   const saturationValueComponent = SaturationValue({DOM, color$});
   const hueComponent = Hue({DOM, color$});
@@ -62,19 +63,18 @@ function ColorPicker ({DOM, onion, props$ = xs.empty()}) {
     textComponent.change$
   ).map(composeColor);
 
+  const reducer$ = xs.merge(
+    initialReducer$,
+    composeColor$
+  );
+
   const vtree$ = xs.combine(
     saturationValueComponent.DOM,
     hueComponent.DOM,
     alphaComponent.DOM,
     textComponent.DOM,
-    swatchComponent.DOM,
-    color$
-  );
-
-  const reducer$ = xs.merge(
-    initialReducer$,
-    composeColor$
-  );
+    swatchComponent.DOM
+    ).compose(dropRepeats((a, b) => JSON.stringify(a) === JSON.stringify(b)));
 
   const colorSink$ = color$.map(color => tinycolor.fromRatio(color).toRgbString());
 

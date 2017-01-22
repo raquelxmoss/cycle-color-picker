@@ -28,10 +28,8 @@ function app (sources) {
   const propsA$ = xs.of({color: '#C3209F'});
   const propsB$ = xs.of({color: '#542A93'});
 
-  const ColorPickerA = isolate(ColorPicker);
-  const colorPickerA = ColorPickerA({...sources, props$: propsA$});
-  const ColorPickerB = isolate(ColorPicker);
-  const colorPickerB = ColorPickerB({...sources, props$: propsB$});
+  const colorPickerA = isolate(ColorPicker)({...sources, props$: propsA$});
+  const colorPickerB = isolate(ColorPicker)({...sources, props$: propsB$});
 
   const state$ = combineObj({
     colorPickerADOM: colorPickerA.DOM,

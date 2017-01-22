@@ -60,7 +60,7 @@ export default function SaturationValue ({DOM, color$}) {
   const saturationValue$ = xs.merge(
     update$,
     saturationValueFromProps$
-  ).startWith({s: 0, v: 0});
+  );
 
   return {
     DOM: xs.combine(color$, saturationValue$, dimensions$).map(view),
