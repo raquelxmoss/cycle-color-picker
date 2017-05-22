@@ -55,7 +55,7 @@ function colorInputShouldChange (state, input) {
 }
 
 function setActiveInputs (name) {
-  return function _setActiveInputs (state) {
+  return function (state){
     const colorInputFormat = colorInputShouldChange(state, name) ? 'rgba' : state.colorInputFormat.value;
 
     return Object.assign(
@@ -73,30 +73,44 @@ function makeInputElementReducer$ (name, DOM) {
   const container = DOM
     .select(`.${name}`);
 
-  const click$ = container
-    .events('click');
-
   const mouseDown$ = container
     .events('mousedown');
 
+  const touchStart$ = container
+    .events('touchstart');
+
+  const mouseUp$ = container
+    .events('mouseup');
+
+  const touchEnd$ = container
+    .events('touchend');
+
   const activeInput$ = xs.merge(
     mouseDown$,
-    click$
+    touchStart$
   )
-  .map(_ => setActiveInputs(name));
+    .map(_ => setActiveInputs(name));
 
-  const deactivateInput$ = click$
-    .compose(delay(200))
+  const deactivateInput$ = xs.merge(
+      mouseUp$,
+      touchEnd$
+  )
+    .compose(delay(16))
     .map(ev => state => Object.assign({}, state, {activeInput: state.activeInput.set('none')}));
 
   const mouseMove$ = container
     .events('mousemove');
 
+  const touchMove$ = container
+      .events('touchmove');
+
   const update$ = xs.merge(
     mouseMove$,
-    click$
+    touchMove$,
+    mouseDown$,
+    touchStart$
   )
-  .map(ev => update[name](ev));
+    .map(ev => update[name](ev));
 
   const container$ = container
     .elements()

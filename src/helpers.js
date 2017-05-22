@@ -9,8 +9,8 @@ export function containerBoundaries (state, event, type) {
   const containerTop = container.top;
 
   // TODO: don't use window here Raquel you dork
-  const left = event.pageX - (containerLeft + window.scrollX);
-  const top = event.pageY - (containerTop + window.scrollY);
+  const left = (event.touches ? event.touches[0].pageX: event.pageX) - (containerLeft + window.scrollX);
+  const top = (event.touches ? event.touches[0].pageY: event.pageY) - (containerTop + window.scrollY);
 
   return {
     containerWidth,
