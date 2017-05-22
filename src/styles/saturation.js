@@ -3,6 +3,7 @@ export const saturation = {
   'height': '127px',
   'width': '100%',
   'cursor': 'pointer',
+  'user-select': 'none',
   'overflow': 'hidden',
   'border-top-left-radius': '2px',
   'border-top-right-radius': '2px',
