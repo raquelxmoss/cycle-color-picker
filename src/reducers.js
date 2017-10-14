@@ -101,6 +101,7 @@ function makeInputElementReducer$ (name, DOM) {
   const container$ = container
     .elements()
     .drop(1)
+    .filter(elements => elements.length > 0)
     .map(el => el[0].getBoundingClientRect())
     .map(value => state => ({...state, [`${name}Container`]: value}))
     .compose(throttle(60));
