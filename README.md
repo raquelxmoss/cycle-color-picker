@@ -33,7 +33,7 @@ const colorPicker = ColorPicker({DOM, props$});
 
 Cycle Color Picker returns `DOM`, and `color$`, which you can access in your app. To display Cycle Color Picker, pass its DOM into your view function.
 
-Here's a simple example of a Color Picker that changes the background color of the app. To see how to use Cycle Color Picker with Cycle's isolate function, [check out the example](http://raquelxmoss.github.io/cycle-color-picker').
+Here's a simple example of a Color Picker that changes the background color of the app. To see how to use Cycle Color Picker with Cycle's isolate function, [check out the example](http://raquelxmoss.github.io/cycle-color-picker).
 
 ```js
 import xs from 'xstream';
