@@ -1,7 +1,5 @@
 import tinycolor from 'tinycolor2';
 import css from 'stylin';
-import _ from 'lodash';
-import fs from 'fs';
 import {div, input, span, p} from '@cycle/dom';
 
 import {isInt} from './helpers';
@@ -36,7 +34,7 @@ function renderColorInputElement (color) {
 
   return (
       div('.color-input-container',
-      _.map(color, (value, channel) => {
+      color.map((value, channel) => {
         return div('.channel-container', [
           makeInputElement(inputType, color, channel),
           span(channel)
