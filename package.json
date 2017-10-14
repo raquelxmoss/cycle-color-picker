@@ -38,6 +38,7 @@
   "homepage": "https://github.com/raquelxmoss/cycle-color-picker",
   "dependencies": {
     "@cycle/dom": "^12.1.0",
+    "lodash.map": "^4.6.0",
     "stylin": "^4.2.0",
     "tinycolor2": "^1.3.0",
     "xstream": "^7.0.0"
