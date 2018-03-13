@@ -1,5 +1,5 @@
 import xs from 'xstream';
-import dropRepeats from 'xstream/extra/droprepeats';
+import dropRepeats from 'xstream/extra/dropRepeats';
 import tinycolor from 'tinycolor2';
 
 import {either} from './helpers';
