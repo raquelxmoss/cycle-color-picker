@@ -1,6 +1,6 @@
 {
   "name": "cycle-color-picker",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A color picker component for Cycle.js",
   "main": "lib/color-picker.js",
   "files": [
