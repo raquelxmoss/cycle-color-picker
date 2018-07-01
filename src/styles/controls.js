@@ -7,6 +7,8 @@ export const controls = {
   'justify-content': 'center',
   'padding': '10px 15px',
   'height': '40px',
+  '-webkit-user-select': 'none',
+  'user-select': 'none',
   '.swatch': {
     '.swatch-color': {
       'width': '20px',

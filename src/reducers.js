@@ -73,30 +73,24 @@ function makeInputElementReducer$ (name, DOM) {
   const container = DOM
     .select(`.${name}`);
 
-  const click$ = container
-    .events('click');
-
   const mouseDown$ = container
     .events('mousedown');
 
-  const activeInput$ = xs.merge(
-    mouseDown$,
-    click$
-  )
-  .map(_ => setActiveInputs(name));
-
-  const deactivateInput$ = click$
-    .compose(delay(200))
-    .map(ev => state => Object.assign({}, state, {activeInput: state.activeInput.set('none')}));
+    const mouseUp$ = container
+    .events('mouseup');
 
   const mouseMove$ = container
     .events('mousemove');
 
-  const update$ = xs.merge(
-    mouseMove$,
-    click$
-  )
-  .map(ev => update[name](ev));
+  const activateInput$ = mouseDown$
+    .map(ev => state => update[name](ev)(setActiveInputs(name)(state)));
+
+  const deactivateInput$ = mouseUp$
+    .map(ev => state => Object.assign({}, update[name](ev)(state), {activeInput: state.activeInput.set('none')}));
+
+  const update$ = mouseMove$
+    .compose(throttle(15))
+    .map(ev => state => update[name](ev)(state))
 
   const container$ = container
     .elements()
@@ -107,7 +101,7 @@ function makeInputElementReducer$ (name, DOM) {
     .compose(throttle(60));
 
   return xs.merge(
-    activeInput$,
+    activateInput$,
     deactivateInput$,
     update$,
     container$
