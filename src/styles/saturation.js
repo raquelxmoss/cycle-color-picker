@@ -6,6 +6,8 @@ export const saturation = {
   'overflow': 'hidden',
   'border-top-left-radius': '2px',
   'border-top-right-radius': '2px',
+  '-webkit-user-select': 'none',
+  'user-select': 'none',
   '.white-overlay': {
     'width': '100%',
     'height': '100%',
