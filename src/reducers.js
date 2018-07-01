@@ -1,6 +1,5 @@
 import xs from 'xstream';
 import debounce from 'xstream/extra/debounce';
-import delay from 'xstream/extra/delay';
 import throttle from 'xstream/extra/throttle';
 import tinycolor from 'tinycolor2';
 
